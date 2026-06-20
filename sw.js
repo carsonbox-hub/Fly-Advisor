@@ -1,5 +1,5 @@
 /* NZ Fly Finder — service worker (offline app shell) */
-const CACHE = "nzflyfinder-v20";
+const CACHE = "nzflyfinder-v25";
 const ASSETS = [
   "./",
   "./index.html",
@@ -8,11 +8,13 @@ const ASSETS = [
   "./icon-512.png",
   "./apple-touch-icon.png"
 ];
+/* Fly thumbnails — precached best-effort (won't block the app shell if any are missing) */
+const FLY_IMAGES = ["hare-copper","pheasant-tail","gold-ribbed-hare-s-ear","stonefly-bomb","glo-bug-egg","damsel-nymph","adams","parachute-adams","royal-wulff","humpy","green-beetle","foam-cicada","elk-hair-caddis","olive-woolly-bugger","black-woolly-bugger","booby-fly","copper-john","zebra-midge","red-setter","rabbit-zonker","pine-squirrel-leech","cdc-emerger","blowfly-dry","klinkhammer","twilight-beauty","kakahi-queen","dad-s-favourite","coch-y-bondhu","willow-grub","mrs-simpson","hamill-s-killer","grey-ghost","parsons-glory","fuzzy-wuzzy","bloodworm","cased-caddis"].map(s=>"./flies/"+s+".webp");
 
 self.addEventListener("install", e => {
   e.waitUntil(
     caches.open(CACHE)
-      .then(c => c.addAll(ASSETS))
+      .then(c => c.addAll(ASSETS).then(() => Promise.allSettled(FLY_IMAGES.map(u => c.add(u)))))
       .then(() => self.skipWaiting())
       .catch(() => {})
   );
