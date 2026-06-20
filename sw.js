@@ -1,5 +1,5 @@
 /* NZ Fly Finder — service worker (offline app shell) */
-const CACHE = "nzflyfinder-v11";
+const CACHE = "nzflyfinder-v12";
 const ASSETS = [
   "./",
   "./index.html",
