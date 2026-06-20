@@ -17,7 +17,7 @@
 
 <style>
 body{margin:0;font-family:system-ui,sans-serif;background:#020617;color:#e5e7eb;display:flex;justify-content:center;min-height:100vh}
-.app{max-width:900px;width:100%;padding:1rem}
+.app{max-width:900px;width:100%;padding:calc(1rem + env(safe-area-inset-top,0px)) calc(1rem + env(safe-area-inset-right,0px)) calc(1rem + env(safe-area-inset-bottom,0px)) calc(1rem + env(safe-area-inset-left,0px))}
 header{display:flex;gap:.75rem;align-items:center;margin-bottom:1rem}
 .fly-icon{width:40px;height:40px;border-radius:999px;background:linear-gradient(135deg,#22c55e,#16a34a);display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:900;color:#022c22}
 h1{margin:0;font-size:1.6rem;font-weight:900}
@@ -499,6 +499,13 @@ function runRecommend(){
 <div class="small">Sizes: ${r.fly.sizes.join(", ")}</div>
 ${whyHtml}
 ${detailsHtml(r.fly)}`;
+      const det=d.querySelector("details");
+      if(det){
+        const sum=det.querySelector("summary");
+        if(sum) sum.addEventListener("click",e=>e.preventDefault());  /* let the card handle the toggle */
+        d.addEventListener("click",()=>{ det.open=!det.open; });
+        d.style.cursor="pointer";
+      }
       out.appendChild(d);
     });
 
