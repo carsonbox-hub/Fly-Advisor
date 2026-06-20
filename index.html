@@ -77,6 +77,7 @@ details li{margin:.2rem 0;font-size:.82rem;color:#cbd5e1;line-height:1.4}
 .ios-ic{display:inline-flex;width:22px;height:22px;vertical-align:-5px;margin:0 .12rem}
 .ios-ic svg{width:20px;height:20px}
 .ios-arrow{text-align:center;color:#0a84ff;font-size:1.5rem;line-height:1;margin-top:.7rem}
+.ios-dontshow{display:block;width:100%;margin-top:1rem;background:transparent;color:#8e8e93;border:none;font-size:.85rem;cursor:pointer;padding:.35rem}
 </style>
 </head>
 
@@ -107,6 +108,7 @@ details li{margin:.2rem 0;font-size:.82rem;color:#cbd5e1;line-height:1.4}
 <li>Tap <span class="ios-ic"><svg viewBox="0 0 24 24" fill="none" stroke="#0a84ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M12 8.5v7M8.5 12h7"/></svg></span> <b>Add to Home Screen</b></li>
 </ol>
 <div class="ios-arrow">▾</div>
+<button id="iosDontShow" class="ios-dontshow" type="button">Don't show this again</button>
 </div>
 </div>
 
@@ -253,10 +255,10 @@ function bandFromSun(h,sr,ss){
 function computeTimeOfDay(){const n=new Date(),h=n.getHours()+n.getMinutes()/60,sun=currentSun();return sun?bandFromSun(h,sun.sunrise,sun.sunset):clockBand(h);}
 function updateTimeOfDayDisplay(){
   const el=document.getElementById("timeOfDayDisplay");if(!el)return;
-  let txt="Time of day: "+labelTime(computeTimeOfDay());
+  let html="Time of day: "+labelTime(computeTimeOfDay());
   const sun=currentSun();
-  if(sun)txt+=` · sunrise ${fmtHM(sun.sunrise)} · sunset ${fmtHM(sun.sunset)}`;
-  el.textContent=txt;
+  if(sun)html+=`<br>sunrise ${fmtHM(sun.sunrise)} · sunset ${fmtHM(sun.sunset)}`;
+  el.innerHTML=html;
 }
 
 /* TOGGLE GROUP CONFIG — [value, label, icon]; first entry is the default */
@@ -643,7 +645,10 @@ if("serviceWorker" in navigator){
   const isIOS=/iphone|ipad|ipod/i.test(ua) || (navigator.platform==="MacIntel" && navigator.maxTouchPoints>1);
   const isIOSSafari=isIOS && /safari/i.test(ua) && !/crios|fxios|edgios|android|chrome/i.test(ua);
   const isMobile=/android|iphone|ipad|ipod|mobile/i.test(ua) || (navigator.maxTouchPoints>1 && window.matchMedia && window.matchMedia("(pointer:coarse)").matches);
-  const dismissed = lsGet("ff_install_dismissed")==="1";
+  /* Tie the "permanently dismissed" state to the release version, so a new release re-shows
+     the install dialog. Bump APP_VERSION in lockstep with the sw.js cache version. */
+  const APP_VERSION="v6";
+  const dismissed = lsGet("ff_install_dismissed")===APP_VERSION;
 
   let deferred=null;
   const showBar=()=>{ if(bar)bar.style.display="flex"; };
@@ -652,19 +657,23 @@ if("serviceWorker" in navigator){
   /* iOS native-style install sheet */
   const sheet=document.getElementById("iosSheet");
   const iosClose=document.getElementById("iosClose");
+  const iosDontShow=document.getElementById("iosDontShow");
   const showSheet=()=>{ if(sheet)sheet.style.display="flex"; };
   const hideSheet=()=>{ if(sheet)sheet.style.display="none"; };
-  if(iosClose) iosClose.addEventListener("click",()=>{ hideSheet(); lsSet("ff_install_dismissed","1"); });
-  if(sheet) sheet.addEventListener("click",(e)=>{ if(e.target===sheet){ hideSheet(); lsSet("ff_install_dismissed","1"); } });
+  /* ✕ and backdrop just close for now — the dialog re-pops on the next load */
+  if(iosClose) iosClose.addEventListener("click",hideSheet);
+  if(sheet) sheet.addEventListener("click",(e)=>{ if(e.target===sheet) hideSheet(); });
+  /* only this permanently stops the dialog */
+  if(iosDontShow) iosDontShow.addEventListener("click",()=>{ hideSheet(); lsSet("ff_install_dismissed",APP_VERSION); });
 
-  /* permanent link: mobile only (when not installed) */
-  if(link && isMobile) link.style.display="";
+  /* "Install app" link: Android mobile only — hidden on iOS and desktop */
+  if(link && isMobile && !isIOS) link.style.display="";
 
-  /* Android / desktop Chromium capture the native prompt */
+  /* Android Chromium capture the native prompt (mobile only — no desktop auto-pop) */
   window.addEventListener("beforeinstallprompt",(e)=>{
     e.preventDefault();
     deferred=e;
-    if(!dismissed && bar){ txt.textContent="Install NZ Fly Finder for one-tap access and offline use."; if(ibInstall)ibInstall.style.display=""; showBar(); }
+    if(!dismissed && bar && isMobile){ txt.textContent="Install NZ Fly Finder for one-tap access and offline use."; if(ibInstall)ibInstall.style.display=""; showBar(); }
   });
 
   async function doInstall(){
@@ -675,10 +684,10 @@ if("serviceWorker" in navigator){
 
   if(ibInstall) ibInstall.addEventListener("click",doInstall);
   if(link) link.addEventListener("click",(e)=>{ e.preventDefault(); doInstall(); });
-  if(ibClose) ibClose.addEventListener("click",()=>{ hideBar(); lsSet("ff_install_dismissed","1"); });
-  window.addEventListener("appinstalled",()=>{ hideBar(); hideSheet(); if(link)link.style.display="none"; lsSet("ff_install_dismissed","1"); });
+  if(ibClose) ibClose.addEventListener("click",()=>{ hideBar(); lsSet("ff_install_dismissed",APP_VERSION); });
+  window.addEventListener("appinstalled",()=>{ hideBar(); hideSheet(); if(link)link.style.display="none"; lsSet("ff_install_dismissed",APP_VERSION); });
 
-  /* iOS Safari has no install API — auto-show the native-style sheet on first visit */
+  /* iOS Safari in the browser: pop the install dialog on EVERY load until permanently dismissed */
   if(isIOSSafari && !dismissed){ showSheet(); }
 })();
 </script>
