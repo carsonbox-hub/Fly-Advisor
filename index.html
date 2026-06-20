@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>NZ Fly Finder</title>
+
+<style>
+body{margin:0;font-family:system-ui,sans-serif;background:#020617;color:#e5e7eb;display:flex;justify-content:center;min-height:100vh}
+.app{max-width:900px;width:100%;padding:1rem}
+header{display:flex;gap:.75rem;align-items:center;margin-bottom:1rem}
+.fly-icon{width:40px;height:40px;border-radius:999px;background:linear-gradient(135deg,#22c55e,#16a34a);display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:900;color:#022c22}
+h1{margin:0;font-size:1.6rem;font-weight:900}
+.subtitle{font-size:.9rem;color:#9ca3af}.boldline{font-weight:900;color:#fff}
+.card{background:#0b1120;border-radius:.75rem;padding:1rem;margin-bottom:1rem;border:1px solid rgba(148,163,184,.2)}
+label{display:block;font-size:.85rem;margin-bottom:.25rem;color:#9ca3af}
+select,button{width:100%;padding:.6rem .7rem;border-radius:.5rem;border:1px solid #1f2937;background:#020617;color:#e5e7eb;font-size:.9rem}
+button{background:#22c55e;color:#022c22;font-weight:700;cursor:pointer;border:none}
+.row{display:grid;grid-template-columns:1fr;gap:.75rem}
+@media(min-width:640px){.row-2{grid-template-columns:repeat(2,1fr)}.row-3{grid-template-columns:repeat(3,1fr)}}
+.fly-card{background:#020617;border-radius:.75rem;padding:.75rem;border:1px solid rgba(148,163,184,.3)}
+.fly-name{font-weight:700;font-size:1rem}.fly-type,.small{font-size:.8rem;color:#9ca3af}
+.tag{font-size:.7rem;padding:.1rem .4rem;border-radius:999px;border:1px solid rgba(148,163,184,.6);font-weight:700}
+</style>
+</head>
+
+<body>
+<div class="app">
+
+<header>
+<div class="fly-icon">🪰</div>
+<div>
+<h1>NZ Fly Finder</h1>
+<div class="subtitle">Conditions • Recommendations • Library</div>
+<div id="timeOfDayDisplay" class="subtitle boldline"></div>
+</div>
+</header>
+
+<button id="openLibraryBtn" style="margin-bottom:1rem;width:100%;">Fly Library</button>
+
+<div id="libraryScreen" style="display:none;">
+<div class="card">
+<h2>Fly Library</h2>
+<div id="library" class="row row-2"></div>
+<button id="backBtn" style="margin-top:1rem;">Back</button>
+</div>
+</div>
+
+<section class="card" id="conditionsCard">
+<h2>Conditions</h2>
+
+<div class="row row-2">
+<div><label>Region</label><select id="region">
+<option value="otago">Otago</option><option value="southland">Southland</option>
+<option value="canterbury">Canterbury</option><option value="westcoast">West Coast</option>
+<option value="taupo">Taupō</option><option value="rotorua">Rotorua</option>
+</select></div>
+
+<div><label>Water type</label><select id="waterType">
+<option value="river">River</option><option value="lake">Lake</option><option value="canal">Canal</option>
+</select></div>
+</div>
+
+<div class="row row-3" style="margin-top:.75rem;">
+<div><label>Clarity</label><select id="clarity">
+<option value="clear">Clear</option><option value="slightly_coloured">Slightly coloured</option><option value="dirty">Dirty</option>
+</select></div>
+
+<div><label>Flow</label><select id="flow">
+<option value="normal">Normal</option><option value="low">Low</option><option value="high">High</option>
+</select></div>
+
+<div><label>Fish rising?</label><select id="rising">
+<option value="unsure">Unsure</option><option value="yes">Yes</option><option value="no">No</option>
+</select></div>
+</div>
+
+<h2 style="margin-top:1rem;">Advanced</h2>
+
+<div class="row row-3">
+<div><label>Water temp</label><select id="waterTemp">
+<option value="cold">Cold</option><option value="mild">Mild</option><option value="warm">Warm</option>
+</select></div>
+
+<div><label>Sky</label><select id="sky">
+<option value="sunny">Sunny</option><option value="cloudy">Cloudy</option><option value="overcast">Overcast</option>
+</select></div>
+
+<div><label>Wind</label><select id="wind">
+<option value="calm">Calm</option><option value="breezy">Breezy</option><option value="windy">Windy</option>
+</select></div>
+</div>
+
+<div class="row row-3" style="margin-top:.75rem;">
+<div><label>River trend</label><select id="riverTrend">
+<option value="stable">Stable</option><option value="rising">Rising</option><option value="dropping">Dropping</option>
+</select></div>
+
+<div><label>Hatch</label><select id="hatch">
+<option value="none">None</option><option value="mayfly">Mayfly</option><option value="caddis">Caddis</option>
+<option value="midge">Midge</option><option value="damsel">Damsel</option>
+</select></div>
+
+<div><label>Structure</label><select id="structure">
+<option value="riffle">Riffle</option><option value="run">Run</option><option value="pool">Pool</option>
+<option value="bank">Undercut bank</option><option value="edge">Lake edge</option>
+</select></div>
+</div>
+
+<div class="row row-2" style="margin-top:.75rem;">
+<div><label>Fish behaviour</label><select id="behaviour">
+<option value="unsure">Unsure</option><option value="chasing">Chasing bait</option>
+<option value="deep">Sitting deep</option><option value="cruising">Cruising edges</option>
+</select></div>
+</div>
+
+<button id="recommendBtn" style="margin-top:1rem;">Recommend flies</button>
+</section>
+
+<section class="card" id="resultsCard">
+<h2>Recommended flies</h2>
+<div id="results" class="row row-2"></div>
+</section>
+
+</div>
+
+<script>
+/* TIME OF DAY */
+function labelTime(t){return{dawn:"Dawn",morning:"Morning",midday:"Midday",evening:"Evening",night:"Night"}[t]}
+function computeTimeOfDayFromClock(){let h=new Date().getHours();if(h>=4&&h<7)return"dawn";if(h>=7&&h<10)return"morning";if(h>=10&&h<16)return"midday";if(h>=16&&h<21)return"evening";return"night"}
+function updateTimeOfDayDisplay(){document.getElementById("timeOfDayDisplay").textContent="Time of day: "+labelTime(computeTimeOfDayFromClock())}
+
+/* SAFE GETTER — THE INFINITE CLICK FIX */
+const safe = id => {
+  const el = document.getElementById(id);
+  return el ? el.value : "";
+};
+
+/* FLY DATABASE */
+const FLIES=[
+{name:"Hare & Copper",type:"nymph",subType:"mayfly",sizes:[10,12,14],tips:["Heavy point fly.","Dead-drift.","All-rounder."]},
+{name:"Pheasant Tail",type:"nymph",subType:"mayfly",sizes:[12,14,16],tips:["Clear water.","Long leader.","Dead-drift."]},
+{name:"Gold-Ribbed Hare’s Ear",type:"nymph",subType:"mayfly",sizes:[10,12,14],tips:["Search pattern.","Works everywhere.","Fish seams."]},
+{name:"Stonefly Bomb",type:"nymph",subType:"stonefly",sizes:[8,10],tips:["Fast water.","Anchor fly.","Deep runs."]},
+{name:"Glo-bug Egg",type:"nymph",subType:"egg",sizes:[8,10],tips:["Spawning.","Behind trout.","Canals."]},
+{name:"Damsel Nymph",type:"nymph",subType:"damsel",sizes:[10,12],tips:["Weed beds.","Slow retrieve.","Lakes."]},
+{name:"Adams",type:"dry",subType:"mayfly",sizes:[12,14,16],tips:["Hatches.","Drag-free.","Clear rivers."]},
+{name:"Parachute Adams",type:"dry",subType:"mayfly",sizes:[14,16],tips:["Emerger.","Picky fish.","Fine tippet."]},
+{name:"Royal Wulff",type:"dry",subType:"attractor",sizes:[10,12],tips:["High float.","Riffles.","Dry-dropper."]},
+{name:"Humpy",type:"dry",subType:"terrestrial",sizes:[10,12],tips:["Beetle.","Windy days.","Banks."]},
+{name:"Green Beetle",type:"dry",subType:"terrestrial",sizes:[12,14],tips:["Windy summer.","Lake edges.","Let sit."]},
+{name:"Foam Cicada",type:"dry",subType:"terrestrial",sizes:[6,8],tips:["Summer.","Plop it.","Bush edges."]},
+{name:"Elk Hair Caddis",type:"dry",subType:"caddis",sizes:[12,14],tips:["Riffles.","Skitter.","Evening."]},
+{name:"Olive Woolly Bugger",type:"streamer",subType:"baitfish",sizes:[6,8],tips:["Strip.","After rain.","Sink tip."]},
+{name:"Black Woolly Bugger",type:"streamer",subType:"baitfish",sizes:[6,8],tips:["Low light.","Long pulls.","Coloured water."]},
+{name:"Booby Fly",type:"streamer",subType:"lure",sizes:[6,8],tips:["Sinking line.","Slow retrieve.","Lakes/canals."]},
+{name:"Copper John",type:"nymph",subType:"mayfly",sizes:[12,14],tips:["Fast sink.","Deep runs.","Point fly."]},
+{name:"Zebra Midge",type:"nymph",subType:"midge",sizes:[16,18],tips:["Winter.","Slow water.","Indicator."]},
+{name:"Red Setter",type:"streamer",subType:"lure",sizes:[4,6],tips:["Taupō.","Strip fast.","Dirty water."]},
+{name:"Rabbit Zonker",type:"streamer",subType:"baitfish",sizes:[4,6],tips:["Night.","Big trout.","Slow strips."]},
+{name:"Pine Squirrel Leech",type:"streamer",subType:"leech",sizes:[8,10],tips:["Cold water.","Slow retrieve.","Lakes."]},
+{name:"CDC Emerger",type:"dry",subType:"emerger",sizes:[14,16],tips:["Evening.","Delicate.","Fine tippet."]},
+{name:"Blowfly Dry",type:"dry",subType:"terrestrial",sizes:[10,12],tips:["Summer.","Windy.","Natural drift."]},
+{name:"Klinkhammer",type:"dry",subType:"emerger",sizes:[12,14],tips:["Emerger.","Picky fish.","Long leader."]}
+];
+
+/* SCORING — EVERY PARAMETER MATTERS */
+function scoreFly(f,c){
+let s=0;
+
+/* REGION */
+if(c.region==="otago"&&["Hare & Copper","Pheasant Tail","Parachute Adams"].includes(f.name))s+=2;
+if(c.region==="southland"&&["Humpy","Royal Wulff","Olive Woolly Bugger","Black Woolly Bugger"].includes(f.name))s+=2;
+if(c.region==="taupo"&&["Glo-bug Egg","Red Setter","Zebra Midge"].includes(f.name))s+=3;
+
+/* WATER TYPE */
+if(c.waterType==="river"&&f.type==="nymph")s+=2;
+if(c.waterType==="lake"&&f.type==="dry")s+=2;
+if(c.waterType==="canal"&&["Glo-bug Egg","Zebra Midge","Booby Fly"].includes(f.name))s+=4;
+
+/* CLARITY */
+if(c.clarity==="clear"&&f.type==="dry")s+=2;
+if(c.clarity==="dirty"&&f.type==="streamer")s+=4;
+
+/* FLOW */
+if(c.flow==="low"&&f.type==="dry")s+=2;
+if(c.flow==="high"&&f.type==="nymph")s+=3;
+
+/* RISING */
+if(c.rising==="yes"&&f.type==="dry")s+=4;
+if(c.rising==="no"&&f.type==="nymph")s+=3;
+
+/* WATER TEMP */
+if(c.waterTemp==="cold"&&f.type==="nymph")s+=3;
+if(c.waterTemp==="warm"&&f.subType==="terrestrial")s+=3;
+
+/* SKY */
+if(c.sky==="sunny"&&f.subType==="terrestrial")s+=3;
+if(c.sky==="overcast"&&f.type==="streamer")s+=3;
+
+/* WIND */
+if(c.wind==="windy"&&f.subType==="terrestrial")s+=4;
+
+/* RIVER TREND */
+if(c.riverTrend==="rising"&&f.type==="streamer")s+=3;
+if(c.riverTrend==="dropping"&&f.type==="nymph")s+=3;
+
+/* HATCH */
+if(c.hatch!=="none"&&f.subType===c.hatch)s+=5;
+
+/* STRUCTURE */
+if(c.structure==="riffle"&&f.subType==="caddis")s+=3;
+if(c.structure==="bank"&&f.subType==="terrestrial")s+=4;
+
+/* BEHAVIOUR */
+if(c.behaviour==="chasing"&&f.type==="streamer")s+=5;
+if(c.behaviour==="deep"&&f.type==="nymph")s+=4;
+
+/* TIME */
+if(c.time==="dawn"&&f.type==="streamer")s+=4;
+if(c.time==="morning"&&f.type==="dry")s+=3;
+if(c.time==="midday"&&f.type==="nymph")s+=4;
+if(c.time==="night"&&f.type==="streamer")s+=6;
+
+return s;
+}
+
+function recommend(c){
+return FLIES.map(f=>({fly:f,score:scoreFly(f,c)}))
+.sort((a,b)=>b.score-a.score)
+.slice(0,6);
+}
+
+/* LIBRARY */
+const libraryScreen=document.getElementById("libraryScreen");
+const library=document.getElementById("library");
+const openLibraryBtn=document.getElementById("openLibraryBtn");
+const backBtn=document.getElementById("backBtn");
+const conditionsCard=document.getElementById("conditionsCard");
+const resultsCard=document.getElementById("resultsCard");
+
+function renderLibrary(){
+library.innerHTML="";
+FLIES.forEach(f=>{
+let tips=f.tips.map(t=>`<li>${t}</li>`).join("");
+let d=document.createElement("div");
+d.className="fly-card";
+d.innerHTML=`<div class="fly-name">${f.name}</div>
+<div class="fly-type">${f.type} • ${f.subType}</div>
+<div class="small">Sizes: ${f.sizes.join(", ")}</div>
+<details><summary>Tips & Tricks</summary><ul>${tips}</ul></details>`;
+library.appendChild(d);
+});
+}
+
+openLibraryBtn.onclick=()=>{
+conditionsCard.style.display="none";
+resultsCard.style.display="none";
+libraryScreen.style.display="block";
+renderLibrary();
+};
+
+backBtn.onclick=()=>{
+libraryScreen.style.display="none";
+conditionsCard.style.display="block";
+resultsCard.style.display="block";
+};
+
+/* ⭐ THE TRUE INFINITE‑CLICK BUTTON ⭐ */
+document.addEventListener("DOMContentLoaded",()=>{
+
+updateTimeOfDayDisplay();
+
+document.getElementById("recommendBtn").addEventListener("click",()=>{
+
+const c={
+region:safe("region"),
+waterType:safe("waterType"),
+clarity:safe("clarity"),
+flow:safe("flow"),
+rising:safe("rising"),
+waterTemp:safe("waterTemp"),
+sky:safe("sky"),
+wind:safe("wind"),
+riverTrend:safe("riverTrend"),
+hatch:safe("hatch"),
+structure:safe("structure"),
+behaviour:safe("behaviour"),
+time:computeTimeOfDayFromClock()
+};
+
+updateTimeOfDayDisplay();
+
+const recs=recommend(c);
+const out=document.getElementById("results");
+out.innerHTML="";
+
+recs.forEach(r=>{
+let tips=r.fly.tips.map(t=>`<li>${t}</li>`).join("");
+let d=document.createElement("div");
+d.className="fly-card";
+d.innerHTML=`
+<div style="display:flex;justify-content:space-between;">
+  <div>
+    <div class="fly-name">${r.fly.name}</div>
+    <div class="fly-type">${r.fly.type} • ${r.fly.subType}</div>
+  </div>
+  <span class="tag">${r.score}</span>
+</div>
+<div class="small">Sizes: ${r.fly.sizes.join(", ")}</div>
+<details><summary>Tips & Tricks</summary><ul>${tips}</ul></details>
+`;
+out.appendChild(d);
+});
+
+});
+});
+</script>
+
+</body>
+</html>
