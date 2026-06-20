@@ -80,10 +80,89 @@ details li{margin:.2rem 0;font-size:.82rem;color:#cbd5e1;line-height:1.4}
 .ios-ic svg{width:20px;height:20px}
 .ios-arrow{text-align:center;color:#0a84ff;font-size:1.5rem;line-height:1;margin-top:.7rem}
 .ios-dontshow{display:block;width:100%;margin-top:1rem;background:transparent;color:#8e8e93;border:none;font-size:.85rem;cursor:pointer;padding:.35rem}
+
+/* ===================== FLAGSHIP UI ===================== */
+#appbg{position:fixed;inset:0;z-index:-2;background:linear-gradient(180deg,#0b1430,#020617);transition:background 2.5s ease}
+#appglow{position:fixed;inset:-10%;z-index:-1;pointer-events:none;transition:background 2.5s ease;will-change:transform}
+
+/* glassmorphism */
+.card{background:rgba(13,21,38,.6);backdrop-filter:blur(12px) saturate(1.15);-webkit-backdrop-filter:blur(12px) saturate(1.15);border:1px solid rgba(148,163,184,.16);box-shadow:0 10px 34px rgba(0,0,0,.38)}
+.fly-card{background:rgba(2,6,23,.5);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border:1px solid rgba(148,163,184,.2)}
+
+/* springy press + ripple */
+button,.tbtn{position:relative;overflow:hidden;transition:transform .12s cubic-bezier(.34,1.56,.64,1),box-shadow .2s,background .2s}
+button:active,.tbtn:active{transform:scale(.95)}
+.ripple{position:absolute;border-radius:50%;background:rgba(255,255,255,.4);transform:translate(-50%,-50%) scale(0);pointer-events:none;animation:ripple .55s ease-out forwards}
+@keyframes ripple{to{transform:translate(-50%,-50%) scale(1);opacity:0}}
+.tbtn.sel{box-shadow:0 0 0 1px #22c55e,0 4px 14px rgba(34,197,94,.35)}
+
+/* living scene */
+.scene-wrap{position:relative;border-radius:16px;overflow:hidden;margin-bottom:1rem;box-shadow:0 10px 34px rgba(0,0,0,.4);border:1px solid rgba(148,163,184,.15)}
+#scene{display:block;width:100%;height:150px}
+.scene-cap{position:absolute;left:13px;bottom:10px;font-size:.9rem;font-weight:800;color:#fff;text-shadow:0 1px 5px rgba(0,0,0,.7);letter-spacing:.2px}
+.scene-cap small{display:block;font-weight:600;opacity:.9;font-size:.72rem;letter-spacing:.3px}
+.parallax{transition:transform .25s ease-out;will-change:transform}
+
+/* cinematic results */
+@keyframes flyIn{0%{opacity:0;transform:translateY(28px) scale(.93)}100%{opacity:1;transform:translateY(0) scale(1)}}
+.fly-card.anim{animation:flyIn .55s cubic-bezier(.22,1,.36,1) both}
+.fly-card.hero{border:1px solid rgba(255,216,77,.5);box-shadow:0 14px 44px rgba(0,0,0,.45),0 0 0 1px rgba(255,216,77,.22),0 0 34px rgba(255,216,77,.16);background:rgba(22,19,4,.5)}
+.fly-card.hero .fly-name{font-size:1.3rem}
+.hero-badge{font-size:.62rem;letter-spacing:.13em;text-transform:uppercase;color:#ffd84d;font-weight:800;margin-bottom:.15rem}
+.medal .disc{overflow:hidden}
+.medal .disc::after{content:"";position:absolute;inset:0;border-radius:999px;background:linear-gradient(120deg,transparent 32%,rgba(255,255,255,.85) 48%,transparent 64%);background-size:300% 300%;animation:shine 2.8s ease-in-out infinite;mix-blend-mode:screen}
+@keyframes shine{0%{background-position:130% 0}55%,100%{background-position:-130% 0}}
+.conf{display:inline-flex;align-items:center;gap:.45rem;margin:.4rem 0 .1rem;font-size:.72rem;color:#9ca3af}
+.conf .ring{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--c,#22c55e) calc(var(--p,0)*1%),rgba(255,255,255,.09) 0)}
+.conf .ring i{width:24px;height:24px;border-radius:50%;background:#0b1120;display:grid;place-items:center;font-size:.6rem;font-weight:800;font-style:normal;color:#e5e7eb}
+
+/* NZ map */
+.map-wrap{display:flex;gap:1rem;align-items:center;flex-wrap:wrap}
+.nzmap{width:128px;flex:none;touch-action:manipulation;filter:drop-shadow(0 6px 14px rgba(0,0,0,.4))}
+.nzmap .island{fill:rgba(34,197,94,.15);stroke:rgba(134,239,172,.55);stroke-width:1.4}
+.nzmap .rdot{fill:rgba(203,213,225,.5);cursor:pointer;transition:fill .2s}
+.nzmap .rdot:hover{fill:#e5e7eb}
+.nzmap .rdot.sel{fill:#22c55e}
+.nzmap .rsel-ring{fill:none;stroke:#22c55e;stroke-width:2.5;filter:drop-shadow(0 0 4px rgba(34,197,94,.8))}
+.nzmap .gps{fill:#38bdf8}
+.nzmap .gps-pulse{fill:#38bdf8;transform-origin:center;transform-box:fill-box}
+@keyframes gpspulse{0%{transform:scale(.6);opacity:.7}100%{transform:scale(3.2);opacity:0}}
+.map-info{flex:1;min-width:150px}
+.map-info .rname{font-size:1.2rem;font-weight:800;color:#fff;line-height:1.15}
+.region-select-hidden{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;overflow:hidden}
+
+/* splash */
+#splash{position:fixed;inset:0;z-index:10000;background:radial-gradient(circle at 50% 38%,#0d3522,#020617 72%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;transition:opacity .6s ease}
+#splash.hide{opacity:0;pointer-events:none}
+#splash .sicon{width:100px;height:100px;border-radius:23px;box-shadow:0 14px 44px rgba(0,0,0,.55);animation:splashpop .7s cubic-bezier(.22,1,.36,1) both;position:relative;z-index:2}
+#splash .stitle{font-size:1.25rem;font-weight:900;color:#fff;opacity:0;animation:fadeUp .6s ease .35s both;position:relative;z-index:2}
+#splash .ssub{font-size:.85rem;color:#86efac;opacity:0;animation:fadeUp .6s ease .5s both;position:relative;z-index:2;margin-top:-.6rem}
+@keyframes splashpop{0%{transform:scale(.6);opacity:0}100%{transform:scale(1);opacity:1}}
+@keyframes fadeUp{0%{opacity:0;transform:translateY(10px)}100%{opacity:1;transform:translateY(0)}}
+#splash .castsvg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:1}
+#splash .cast{stroke:#86efac;stroke-width:2;fill:none;stroke-dasharray:520;stroke-dashoffset:520;animation:cast 1.2s ease .3s forwards}
+@keyframes cast{to{stroke-dashoffset:0}}
+
+@media(prefers-reduced-motion:reduce){
+  .fly-card.anim{animation:none}
+  .medal .disc::after{animation:none;opacity:.25}
+  #splash .sicon,#splash .stitle,#splash .ssub,#splash .cast{animation:none}
+}
 </style>
 </head>
 
 <body>
+
+<div id="appbg"></div>
+<div id="appglow" class="parallax"></div>
+
+<div id="splash">
+<svg class="castsvg" viewBox="0 0 400 800" preserveAspectRatio="xMidYMid slice"><path class="cast" d="M40 760 C140 600 120 360 240 260 C320 195 360 150 372 120"/></svg>
+<img class="sicon" src="icon-192.png" alt=""/>
+<div class="stitle">NZ Fly Finder</div>
+<div class="ssub">Reading the water…</div>
+</div>
+
 <div class="app">
 
 <div id="installBar" class="install-bar" style="display:none;">
@@ -130,6 +209,11 @@ details li{margin:.2rem 0;font-size:.82rem;color:#cbd5e1;line-height:1.4}
 <button id="openLibraryBtn" class="icon-btn" aria-label="Fly Library" title="Fly Library"><svg viewBox="0 0 24 24" fill="none" stroke="#022c22" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg><span>Fly Library</span></button>
 </div>
 
+<div id="sceneWrap" class="scene-wrap parallax">
+<canvas id="scene"></canvas>
+<div class="scene-cap" id="sceneCap"></div>
+</div>
+
 <div id="libraryScreen" style="display:none;">
 <div class="card">
 <h2>Fly Library</h2>
@@ -140,7 +224,22 @@ details li{margin:.2rem 0;font-size:.82rem;color:#cbd5e1;line-height:1.4}
 
 <section class="card" id="regionCard">
 <h2>Region</h2>
-<div><select id="region">
+<div class="map-wrap">
+<svg class="nzmap" id="nzmap" viewBox="0 0 200 330" aria-label="New Zealand region map">
+<path id="niPath" class="island" d=""/>
+<path id="siPath" class="island" d=""/>
+<path id="stPath" class="island" d=""/>
+<g id="gpsLayer"></g>
+<circle id="rselRing" class="rsel-ring" r="7" cx="-99" cy="-99"/>
+<g id="rdots"></g>
+</svg>
+<div class="map-info">
+<div class="rname" id="rname">—</div>
+<div id="geoStatus" class="small" style="margin-top:.3rem;"></div>
+<div class="small" style="margin-top:.45rem;color:#6b7280;">Tap the map to pick your region.</div>
+</div>
+</div>
+<select id="region" class="region-select-hidden" tabindex="-1" aria-hidden="true">
 <option value="northland">Northland</option>
 <option value="aucklandwaikato">Auckland/Waikato</option>
 <option value="eastern">Eastern (Rotorua/BoP)</option>
@@ -155,8 +254,6 @@ details li{margin:.2rem 0;font-size:.82rem;color:#cbd5e1;line-height:1.4}
 <option value="otago">Otago</option>
 <option value="southland">Southland</option>
 </select>
-<div id="geoStatus" class="small" style="margin-top:.3rem;"></div>
-</div>
 </section>
 
 <section class="card" id="conditionsCard">
@@ -300,6 +397,7 @@ function buildToggles(){
         host.dataset.value=v;
         host.querySelectorAll(".tbtn").forEach(x=>x.classList.remove("sel"));
         b.classList.add("sel");
+        if(navigator.vibrate)navigator.vibrate(8);
       });
       host.appendChild(b);
     });
@@ -534,11 +632,12 @@ function locateMe(){
   navigator.geolocation.getCurrentPosition(pos=>{
     USER_COORDS={lat:pos.coords.latitude,lon:pos.coords.longitude};
     const nr=nearestRegion(USER_COORDS.lat,USER_COORDS.lon);
-    const sel=document.getElementById("region");
-    if(sel&&nr.region) sel.value=nr.region;
+    if(nr.region) selectRegionOnMap(nr.region);
+    placeGps(USER_COORDS.lat,USER_COORDS.lon);
     const name=REGION_NAME[nr.region]||nr.region;
     if(geoStatus)geoStatus.textContent=`📍 Nearest region: ${name} (~${Math.round(nr.km)} km away).`;
     updateTimeOfDayDisplay();
+    applyTheme();
   },err=>{
     let m="Couldn't get your location — using the dropdown.";
     if(err.code===1)m="Location off — using the dropdown. Allow location to auto-set your region.";
@@ -577,6 +676,8 @@ function runRecommend(){
 
     const recs=recommend(c);
     out.innerHTML="";
+    if(navigator.vibrate)navigator.vibrate(18);
+    const maxScore=recs.length?recs[0].score:0;
 
     recs.forEach((r,i)=>{
       const badge = i<3
@@ -586,9 +687,15 @@ function runRecommend(){
       const whyHtml = why.length
         ? `<div class="why"><b>Why:</b> ${why.join(" · ")}</div>`
         : `<div class="why"><b>Why:</b> a solid all-round choice for these conditions</div>`;
+      let pct = maxScore>0 ? Math.round(r.score/maxScore*100) : (i===0?100:55);
+      pct = Math.max(6,Math.min(100,pct));
+      const ringColor = i===0 ? "#ffd84d" : "#22c55e";
+      const conf = `<div class="conf"><span class="ring" style="--p:${pct};--c:${ringColor}"><i>${pct}%</i></span>match strength</div>`;
       let d=document.createElement("div");
-      d.className="fly-card";
+      d.className="fly-card anim"+(i===0?" hero":"");
+      d.style.animationDelay=(i*0.08).toFixed(2)+"s";
       d.innerHTML=`
+${i===0?'<div class="hero-badge">★ Top pick for these conditions</div>':''}
 <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:.5rem;">
   <div>
     <div class="fly-name">${r.fly.name}</div>
@@ -597,6 +704,7 @@ function runRecommend(){
   ${badge}
 </div>
 <div class="small">Sizes: ${r.fly.sizes.join(", ")}</div>
+${conf}
 ${whyHtml}
 ${detailsHtml(r.fly)}`;
       const det=d.querySelector("details");
@@ -628,8 +736,169 @@ ${detailsHtml(r.fly)}`;
   }
 }
 
+/* ===================== FLAGSHIP UI ENGINE ===================== */
+function hexA(hex,a){const n=parseInt(hex.slice(1),16);return `rgba(${n>>16&255},${n>>8&255},${n&255},${a})`;}
+function shade2(hex,amt){const n=parseInt(hex.slice(1),16);const r=Math.max(0,Math.min(255,(n>>16&255)+amt)),g=Math.max(0,Math.min(255,(n>>8&255)+amt)),b=Math.max(0,Math.min(255,(n&255)+amt));return "#"+((r<<16)|(g<<8)|b).toString(16).padStart(6,"0");}
+function capWord(s){s=(s||"").replace(/_/g," ");return s.charAt(0).toUpperCase()+s.slice(1);}
+
+const SKYPAL={
+  dawn:   {top:"#3a4a78",low:"#f2c79a",sun:"#ffd9a0",isNight:false,water:"#33415c",accent:"#fca5a5",bg1:"#2a2540"},
+  morning:{top:"#2f6fb0",low:"#cfe8f7",sun:"#fff3c0",isNight:false,water:"#2f5a7a",accent:"#7dd3fc",bg1:"#143055"},
+  midday: {top:"#1f6fd0",low:"#bfe0f5",sun:"#fffbe6",isNight:false,water:"#2766a0",accent:"#38bdf8",bg1:"#0e3a6b"},
+  evening:{top:"#26314f",low:"#f0a86a",sun:"#ffb86b",isNight:false,water:"#283a52",accent:"#fb923c",bg1:"#3a2230"},
+  night:  {top:"#05080f",low:"#142046",sun:"#dfe7ff",isNight:true,water:"#0a1326",accent:"#818cf8",bg1:"#0a1230"}
+};
+function currentPal(){return SKYPAL[computeTimeOfDay()]||SKYPAL.midday;}
+function applyTheme(){
+  const p=currentPal();
+  const bg=document.getElementById("appbg"), glow=document.getElementById("appglow");
+  if(bg)bg.style.background=`linear-gradient(180deg,${p.bg1},#020617 72%)`;
+  if(glow)glow.style.background=`radial-gradient(60% 42% at 50% 0%, ${hexA(p.accent,.16)}, transparent 70%)`;
+  const tc=document.querySelector('meta[name="theme-color"]'); if(tc)tc.setAttribute("content",p.bg1);
+}
+
+/* ---- living river scene ---- */
+function blob(ctx,x,y,s){ctx.beginPath();ctx.arc(x,y,10*s,0,6.283);ctx.arc(x+12*s,y+3*s,8*s,0,6.283);ctx.arc(x-12*s,y+3*s,8*s,0,6.283);ctx.arc(x,y+5*s,12*s,0,6.283);ctx.fill();}
+function startScene(){
+  const cv=document.getElementById("scene"); if(!cv) return;
+  const ctx=cv.getContext("2d"); if(!ctx) return;
+  let W=0,H=0,dpr=1,clouds=[],stars=[],rain=[];
+  function resize(){
+    dpr=Math.min(window.devicePixelRatio||1,2);
+    W=cv.clientWidth||320; H=cv.clientHeight||150;
+    cv.width=Math.max(1,Math.round(W*dpr)); cv.height=Math.max(1,Math.round(H*dpr));
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    clouds=Array.from({length:6},()=>({x:Math.random()*W,y:8+Math.random()*38,s:.5+Math.random()*.8,sp:.05+Math.random()*.10}));
+    stars=Array.from({length:46},()=>({x:Math.random()*W,y:Math.random()*H*.5,r:Math.random()*1.1+.2,t:Math.random()*6.28}));
+    rain=Array.from({length:130},()=>({x:Math.random()*W,y:Math.random()*H,l:6+Math.random()*8,sp:3+Math.random()*4}));
+  }
+  resize(); window.addEventListener("resize",resize);
+  const windSpeed=w=> w==="windy"?2.2 : w==="calm"?0.35 : 1.0;
+  const waterCol=(cl,base)=> cl==="dirty"?"#5b4326" : cl==="slightly_coloured"?"#2f5145" : base;
+  let t=0,lastCap="";
+  function frame(){
+    t++;
+    const p=currentPal();
+    const clarity=safe("clarity")||"clear",sky=safe("sky")||"sunny",wind=safe("wind")||"calm",flow=safe("flow")||"normal";
+    const ws=windSpeed(wind), horizon=H*0.62;
+    let g=ctx.createLinearGradient(0,0,0,horizon); g.addColorStop(0,p.top); g.addColorStop(1,p.low);
+    ctx.fillStyle=g; ctx.fillRect(0,0,W,horizon);
+    if(p.isNight){ stars.forEach(s=>{ ctx.globalAlpha=.4+.6*Math.abs(Math.sin(t*.03+s.t)); ctx.fillStyle="#dfe7ff"; ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,6.283); ctx.fill(); }); ctx.globalAlpha=1; }
+    const sx=W*0.78, sy=horizon*0.40, sunR=p.isNight?12:18;
+    const rg=ctx.createRadialGradient(sx,sy,2,sx,sy,sunR*3); rg.addColorStop(0,hexA(p.sun,.9)); rg.addColorStop(.4,hexA(p.sun,.32)); rg.addColorStop(1,"transparent");
+    ctx.fillStyle=rg; ctx.beginPath(); ctx.arc(sx,sy,sunR*3,0,6.283); ctx.fill();
+    ctx.fillStyle=p.sun; ctx.beginPath(); ctx.arc(sx,sy,sunR,0,6.283); ctx.fill();
+    if(p.isNight){ ctx.fillStyle=p.top; ctx.beginPath(); ctx.arc(sx+5,sy-4,sunR,0,6.283); ctx.fill(); }
+    const cloudN=sky==="overcast"?6:sky==="cloudy"?3:1, cloudA=sky==="overcast"?.85:sky==="cloudy"?.6:.4;
+    ctx.fillStyle=p.isNight?"#2a3550":"#eef3f8";
+    clouds.slice(0,cloudN).forEach(c=>{ c.x+=c.sp*ws; if(c.x>W+40)c.x=-40; ctx.globalAlpha=cloudA; blob(ctx,c.x,c.y,c.s); });
+    ctx.globalAlpha=1;
+    ctx.fillStyle=hexA(p.water,.92); ctx.beginPath(); ctx.moveTo(0,horizon);
+    for(let x=0;x<=W;x+=18) ctx.lineTo(x,horizon-13-9*Math.sin(x*0.02)); ctx.lineTo(W,horizon); ctx.closePath(); ctx.fill();
+    const wc=waterCol(clarity,p.water); let wg=ctx.createLinearGradient(0,horizon,0,H); wg.addColorStop(0,wc); wg.addColorStop(1,shade2(wc,-18));
+    ctx.fillStyle=wg; ctx.fillRect(0,horizon,W,H-horizon);
+    ctx.save(); ctx.beginPath(); ctx.rect(0,horizon,W,H-horizon); ctx.clip();
+    ctx.globalAlpha=.16; ctx.fillStyle=p.sun;
+    for(let y=horizon;y<H;y+=4){ const off=Math.sin(t*.06*ws+y*.3)*6; ctx.fillRect(sx-14+off,y,28,2); }
+    ctx.globalAlpha=1; ctx.strokeStyle=hexA("#ffffff",.10); ctx.lineWidth=1;
+    for(let i=0;i<5;i++){ const yy=horizon+8+i*((H-horizon)/5); ctx.beginPath();
+      for(let x=0;x<=W;x+=8){ const yo=Math.sin((x*0.05)+(t*0.04*ws)+i)*2; x===0?ctx.moveTo(x,yy+yo):ctx.lineTo(x,yy+yo); } ctx.stroke(); }
+    ctx.restore();
+    if(clarity==="dirty"||flow==="high"){ const dens=flow==="high"?130:75; ctx.strokeStyle=hexA("#cfe8ff",.34); ctx.lineWidth=1;
+      rain.slice(0,dens).forEach(d=>{ d.y+=d.sp*2.2; d.x+=ws*1.2; if(d.y>H){d.y=-8;d.x=Math.random()*W;} ctx.beginPath(); ctx.moveTo(d.x,d.y); ctx.lineTo(d.x-ws*2,d.y+d.l); ctx.stroke(); }); }
+    ctx.strokeStyle=p.isNight?"#0c1a12":"#14361f"; ctx.lineWidth=2;
+    for(let i=0;i<W;i+=10){ const sway=Math.sin(t*0.05*ws+i)*ws*3; ctx.beginPath(); ctx.moveTo(i,H); ctx.quadraticCurveTo(i+sway,H-13,i+sway*1.6,H-22); ctx.stroke(); }
+    const cap=document.getElementById("sceneCap");
+    if(cap){ const sCap=labelTime(computeTimeOfDay())+"<small>"+capWord(clarity)+" · "+capWord(wind)+" · "+capWord(sky)+"</small>"; if(sCap!==lastCap){cap.innerHTML=sCap;lastCap=sCap;} }
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+}
+
+/* ---- interactive NZ map ---- */
+const MAP_VIEW={lonMin:166.3,lonMax:178.6,latN:-34.3,latS:-47.3,W:200,H:330};
+function projX(lon){return (lon-MAP_VIEW.lonMin)/(MAP_VIEW.lonMax-MAP_VIEW.lonMin)*MAP_VIEW.W;}
+function projY(lat){return (MAP_VIEW.latN-lat)/(MAP_VIEW.latN-MAP_VIEW.latS)*MAP_VIEW.H;}
+const SVGNS="http://www.w3.org/2000/svg";
+
+/* Simplified NZ coastline as [lon,lat] points — projected with the same transform as the dots */
+const NZ_COAST={
+  north:[[172.68,-34.43],[173.05,-34.41],[173.4,-34.9],[174.0,-35.1],[174.5,-35.83],[174.6,-36.15],[175.33,-36.48],[175.9,-37.05],[176.0,-37.55],[177.0,-37.9],[178.0,-37.55],[178.55,-37.69],[178.3,-38.3],[178.02,-38.66],[177.9,-39.15],[177.1,-39.4],[177.1,-39.65],[176.6,-40.5],[176.22,-40.9],[175.5,-41.4],[175.28,-41.61],[174.9,-41.4],[174.78,-41.29],[174.85,-40.6],[175.05,-39.93],[174.3,-39.55],[173.76,-39.3],[174.07,-39.06],[174.6,-38.7],[174.8,-37.8],[174.5,-37.05],[174.2,-36.4],[173.4,-35.45],[173.05,-35.0]],
+  south:[[172.68,-40.5],[173.0,-40.85],[173.28,-41.27],[173.8,-41.1],[174.33,-41.1],[174.27,-41.74],[173.7,-42.42],[173.05,-43.05],[172.75,-43.55],[173.1,-43.75],[172.7,-44.0],[171.25,-44.4],[171.1,-45.1],[170.75,-45.88],[169.8,-46.45],[168.85,-46.6],[168.35,-46.6],[167.5,-46.2],[166.9,-46.1],[166.5,-45.6],[166.7,-45.0],[167.0,-44.5],[168.0,-44.1],[168.6,-43.97],[169.6,-43.4],[170.97,-42.72],[171.2,-42.45],[171.6,-41.75],[172.1,-41.25],[172.5,-40.7]],
+  stewart:[[167.7,-46.85],[168.15,-46.75],[168.3,-47.05],[167.95,-47.2],[167.6,-47.05]]
+};
+function coastPath(pts){return pts.map((p,i)=>(i?"L":"M")+projX(p[0]).toFixed(1)+" "+projY(p[1]).toFixed(1)).join(" ")+" Z";}
+function buildCoast(){
+  const ni=document.getElementById("niPath"),si=document.getElementById("siPath"),st=document.getElementById("stPath");
+  if(ni)ni.setAttribute("d",coastPath(NZ_COAST.north));
+  if(si)si.setAttribute("d",coastPath(NZ_COAST.south));
+  if(st)st.setAttribute("d",coastPath(NZ_COAST.stewart));
+}
+
+function buildMap(){
+  buildCoast();
+  const g=document.getElementById("rdots"); if(!g) return;
+  g.innerHTML="";
+  REGION_PTS.forEach(([val,lat,lon])=>{
+    const c=document.createElementNS(SVGNS,"circle");
+    c.setAttribute("cx",projX(lon).toFixed(1)); c.setAttribute("cy",projY(lat).toFixed(1));
+    c.setAttribute("r","4.5"); c.setAttribute("class","rdot"); c.dataset.region=val;
+    c.addEventListener("click",()=>{ selectRegionOnMap(val); if(navigator.vibrate)navigator.vibrate(10); });
+    const ti=document.createElementNS(SVGNS,"title"); ti.textContent=REGION_NAME[val]||val; c.appendChild(ti);
+    g.appendChild(c);
+  });
+  const sel=document.getElementById("region");
+  selectRegionOnMap(sel?sel.value:"northland");
+}
+function selectRegionOnMap(val){
+  const sel=document.getElementById("region"); if(sel) sel.value=val;
+  let target=null;
+  document.querySelectorAll("#rdots .rdot").forEach(d=>{ const on=d.dataset.region===val; d.classList.toggle("sel",on); if(on)target=d; });
+  const ring=document.getElementById("rselRing");
+  if(target&&ring){ ring.setAttribute("cx",target.getAttribute("cx")); ring.setAttribute("cy",target.getAttribute("cy")); }
+  const rn=document.getElementById("rname"); if(rn)rn.textContent=REGION_NAME[val]||val;
+}
+function placeGps(lat,lon){
+  const layer=document.getElementById("gpsLayer"); if(!layer) return;
+  let x=Math.max(4,Math.min(196,projX(lon))), y=Math.max(4,Math.min(326,projY(lat)));
+  layer.innerHTML=`<circle class="gps-pulse" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="5" style="animation:gpspulse 1.6s ease-out infinite"/><circle class="gps" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3.2"/>`;
+}
+
+/* ---- splash / ripples / parallax ---- */
+function initSplash(){
+  const sp=document.getElementById("splash"); if(!sp) return;
+  const done=()=>{ sp.classList.add("hide"); setTimeout(()=>{ if(sp.parentNode)sp.parentNode.removeChild(sp); },650); };
+  sp.addEventListener("click",done);
+  setTimeout(done,1600);
+}
+function initRipples(){
+  document.addEventListener("click",(e)=>{
+    const el=e.target.closest("button,.tbtn"); if(!el) return;
+    const rect=el.getBoundingClientRect();
+    const r=document.createElement("span"); r.className="ripple";
+    const size=Math.max(rect.width,rect.height)*1.5;
+    r.style.width=r.style.height=size+"px";
+    r.style.left=(e.clientX-rect.left)+"px"; r.style.top=(e.clientY-rect.top)+"px";
+    el.appendChild(r); setTimeout(()=>r.remove(),600);
+  },true);
+}
+function initParallax(){
+  const els=[...document.querySelectorAll(".parallax")]; if(!els.length) return;
+  let cur={x:0,y:0},tgt={x:0,y:0},raf=0;
+  function tick(){ cur.x+=(tgt.x-cur.x)*.08; cur.y+=(tgt.y-cur.y)*.08; els.forEach((el,i)=>{ const d=(i+1)*3; el.style.transform=`translate(${(cur.x*d).toFixed(1)}px,${(cur.y*d).toFixed(1)}px)`; }); raf=requestAnimationFrame(tick); }
+  function set(px,py){ tgt.x=Math.max(-1,Math.min(1,px)); tgt.y=Math.max(-1,Math.min(1,py)); if(!raf)raf=requestAnimationFrame(tick); }
+  window.addEventListener("mousemove",(e)=>set(e.clientX/window.innerWidth-.5,e.clientY/window.innerHeight-.5),{passive:true});
+  if(window.DeviceOrientationEvent) window.addEventListener("deviceorientation",(e)=>{ if(e.gamma==null)return; set(e.gamma/45*.6,(e.beta-45)/45*.6); },{passive:true});
+}
+
 (function init(){
   buildToggles();
+  buildMap();
+  applyTheme();
+  startScene();
+  initRipples();
+  initParallax();
+  initSplash();
   updateTimeOfDayDisplay();
   locateMe();
   const btn=document.getElementById("recommendBtn");
@@ -667,7 +936,7 @@ if("serviceWorker" in navigator){
   const isMobile=/android|iphone|ipad|ipod|mobile/i.test(ua) || (navigator.maxTouchPoints>1 && window.matchMedia && window.matchMedia("(pointer:coarse)").matches);
   /* Tie the "permanently dismissed" state to the release version, so a new release re-shows
      the install dialog. Bump APP_VERSION in lockstep with the sw.js cache version. */
-  const APP_VERSION="v13";
+  const APP_VERSION="v15";
   const dismissed = lsGet("ff_install_dismissed")===APP_VERSION;
 
   let deferred=null;
