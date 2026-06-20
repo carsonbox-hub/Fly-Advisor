@@ -39,7 +39,7 @@ button{background:#22c55e;color:#022c22;font-weight:700;cursor:pointer;border:no
 .howto{font-size:.82rem;color:#cbd5e1;margin:.45rem 0 .35rem;line-height:1.45}
 summary{cursor:pointer;font-size:.85rem;color:#cbd5e1;margin-top:.35rem}
 details ul{margin:.35rem 0 .15rem 1.05rem;padding:0}
-details li{margin:.2rem 0;font-size:.82rem;color:#9ca3af;line-height:1.4}
+details li{margin:.2rem 0;font-size:.82rem;color:#cbd5e1;line-height:1.4}
 
 /* TOGGLE BUTTON GROUPS */
 .toggle{display:flex;flex-wrap:wrap;gap:.35rem}
@@ -55,11 +55,23 @@ details li{margin:.2rem 0;font-size:.82rem;color:#9ca3af;line-height:1.4}
 .medal.gold .disc{background:radial-gradient(circle at 32% 28%,#fff6c0,#ffd84d 45%,#d4af37);color:#5a4400}
 .medal.silver .disc{background:radial-gradient(circle at 32% 28%,#ffffff,#dfe3e6 45%,#a8b0b6);color:#3a3f44}
 .medal.bronze .disc{background:radial-gradient(circle at 32% 28%,#f3d2ac,#d98c46 45%,#a45f2b);color:#3a2110}
+
+/* INSTALL BANNER */
+.install-bar{display:flex;align-items:center;gap:.6rem;background:#0b1120;border:1px solid #22c55e;border-radius:.6rem;padding:.55rem .7rem;margin-bottom:1rem}
+.install-bar .ib-text{flex:1;font-size:.82rem;color:#e5e7eb;line-height:1.35}
+.install-bar .ib-install{width:auto;flex:0 0 auto;padding:.4rem .8rem;font-size:.82rem}
+.install-bar .ib-close{width:auto;flex:0 0 auto;background:transparent;color:#9ca3af;border:none;font-size:1.05rem;cursor:pointer;padding:.1rem .3rem}
 </style>
 </head>
 
 <body>
 <div class="app">
+
+<div id="installBar" class="install-bar" style="display:none;">
+<div class="ib-text" id="ibText"></div>
+<button id="ibInstall" class="ib-install" style="display:none;">Install</button>
+<button id="ibClose" class="ib-close" aria-label="Dismiss">✕</button>
+</div>
 
 <header>
 <div class="fly-icon">🪰</div>
@@ -69,6 +81,8 @@ details li{margin:.2rem 0;font-size:.82rem;color:#9ca3af;line-height:1.4}
 <div id="timeOfDayDisplay" class="subtitle boldline"></div>
 </div>
 </header>
+
+<button id="installLink" type="button" style="display:none;width:auto;background:transparent;color:#22c55e;border:none;padding:0;margin:0 0 .9rem;font-size:.85rem;font-weight:700;cursor:pointer;text-decoration:underline;">⬇ Install app</button>
 
 <button id="openLibraryBtn" style="margin-bottom:1rem;width:100%;">Fly Library</button>
 
@@ -272,9 +286,10 @@ const FLIES=[
 
 function detailsHtml(f){
   const tips=f.tips.map(t=>`<li>${t}</li>`).join("");
-  return `<details><summary>Tips &amp; Tricks</summary>
-<div class="howto"><b>How to fish a ${f.type}:</b> ${TYPE_GUIDE[f.type]||""}</div>
-<ul>${tips}</ul></details>`;
+  return `<details><summary>More info</summary>
+<div class="howto"><b>Fly details:</b></div>
+<ul>${tips}</ul>
+<div class="howto"><b>How to fish a ${f.type}:</b><br>${TYPE_GUIDE[f.type]||""}</div></details>`;
 }
 
 /* ============================================================
@@ -422,7 +437,7 @@ function locateMe(){
     const sel=document.getElementById("region");
     if(sel&&nr.region) sel.value=nr.region;
     const name=REGION_NAME[nr.region]||nr.region;
-    if(geoStatus)geoStatus.textContent=`📍 Nearest region: ${name} (~${Math.round(nr.km)} km away). Time of day uses your local sunrise/sunset.`;
+    if(geoStatus)geoStatus.textContent=`📍 Nearest region: ${name} (~${Math.round(nr.km)} km away).`;
     updateTimeOfDayDisplay();
   },err=>{
     let m="Couldn't get your location — using the dropdown.";
@@ -524,6 +539,56 @@ if("serviceWorker" in navigator){
     navigator.serviceWorker.register("sw.js").catch(()=>{});
   });
 }
+
+/* ---------- ADD TO HOME SCREEN (banner + permanent "Install app" link) ---------- */
+(function installPrompt(){
+  const bar=document.getElementById("installBar");
+  const txt=document.getElementById("ibText");
+  const ibInstall=document.getElementById("ibInstall");
+  const ibClose=document.getElementById("ibClose");
+  const link=document.getElementById("installLink");
+
+  function lsGet(k){try{return localStorage.getItem(k);}catch(e){return null;}}
+  function lsSet(k,v){try{localStorage.setItem(k,v);}catch(e){}}
+
+  const standalone = (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) || navigator.standalone===true;
+  if(standalone){ if(link)link.style.display="none"; return; }   /* already installed */
+
+  const ua=navigator.userAgent||"";
+  const isIOS=/iphone|ipad|ipod/i.test(ua) || (navigator.platform==="MacIntel" && navigator.maxTouchPoints>1);
+  const isIOSSafari=isIOS && /safari/i.test(ua) && !/crios|fxios|edgios|android|chrome/i.test(ua);
+  const isMobile=/android|iphone|ipad|ipod|mobile/i.test(ua) || (navigator.maxTouchPoints>1 && window.matchMedia && window.matchMedia("(pointer:coarse)").matches);
+  const dismissed = lsGet("ff_install_dismissed")==="1";
+
+  let deferred=null;
+  const showBar=()=>{ if(bar)bar.style.display="flex"; };
+  const hideBar=()=>{ if(bar)bar.style.display="none"; };
+  function iosNote(){ if(txt)txt.innerHTML="To install: tap the <b>Share</b> icon (the square with an up-arrow), then <b>Add to Home Screen</b>."; if(ibInstall)ibInstall.style.display="none"; showBar(); }
+
+  /* permanent link: mobile only (when not installed) */
+  if(link && isMobile) link.style.display="";
+
+  /* Android / desktop Chromium capture the native prompt */
+  window.addEventListener("beforeinstallprompt",(e)=>{
+    e.preventDefault();
+    deferred=e;
+    if(!dismissed && bar){ txt.textContent="Install NZ Fly Finder for one-tap access and offline use."; if(ibInstall)ibInstall.style.display=""; showBar(); }
+  });
+
+  async function doInstall(){
+    if(deferred){ deferred.prompt(); try{ await deferred.userChoice; }catch(e){} deferred=null; hideBar(); return; }
+    if(isIOSSafari){ iosNote(); return; }
+    if(txt){ txt.innerHTML="To install, open your browser menu and choose <b>Install</b> or <b>Add to Home Screen</b>."; if(ibInstall)ibInstall.style.display="none"; showBar(); }
+  }
+
+  if(ibInstall) ibInstall.addEventListener("click",doInstall);
+  if(link) link.addEventListener("click",(e)=>{ e.preventDefault(); doInstall(); });
+  if(ibClose) ibClose.addEventListener("click",()=>{ hideBar(); lsSet("ff_install_dismissed","1"); });
+  window.addEventListener("appinstalled",()=>{ hideBar(); if(link)link.style.display="none"; lsSet("ff_install_dismissed","1"); });
+
+  /* iOS Safari has no install API — auto-show steps on first visit */
+  if(isIOSSafari && !dismissed){ iosNote(); }
+})();
 </script>
 
 </body>
