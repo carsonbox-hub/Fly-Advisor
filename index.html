@@ -148,6 +148,33 @@ button:active,.tbtn:active{transform:scale(.95)}
   .medal .disc::after{animation:none;opacity:.25}
   #splash .sicon,#splash .stitle,#splash .ssub,#splash .cast{animation:none}
 }
+
+/* ===================== FLY LIBRARY WOW ===================== */
+.lib-toolbar{display:flex;flex-direction:column;gap:.6rem;margin-bottom:.9rem}
+.lib-search{width:100%;padding:.55rem .7rem;border-radius:.6rem;border:1px solid #1f2937;background:rgba(2,6,23,.6);color:#e5e7eb;font-size:.9rem}
+.lib-chips{display:flex;flex-wrap:wrap;gap:.4rem}
+.chip{width:auto;padding:.35rem .8rem;border-radius:999px;background:rgba(2,6,23,.6);color:#cbd5e1;border:1px solid #1f2937;font-size:.8rem;font-weight:700;cursor:pointer}
+.chip.sel{background:#22c55e;color:#022c22;border-color:#22c55e}
+.fly-card.lib{cursor:pointer}
+.btags{display:flex;flex-wrap:wrap;gap:.3rem;margin-top:.5rem}
+.btag{font-size:.66rem;font-weight:700;padding:.12rem .45rem;border-radius:999px;background:rgba(34,197,94,.14);color:#86efac;border:1px solid rgba(134,239,172,.3)}
+.spec-hint{margin-top:.55rem;font-size:.74rem;color:#38bdf8;font-weight:700}
+#libEmpty{display:none;color:#9ca3af;font-size:.9rem;padding:.5rem}
+
+.spec-overlay{position:fixed;inset:0;z-index:9998;background:rgba(2,6,23,.72);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);display:flex;align-items:flex-start;justify-content:center;overflow-y:auto;padding:1.2rem;perspective:1400px}
+.spec-card{position:relative;width:100%;max-width:560px;background:rgba(13,21,38,.94);border:1px solid rgba(148,163,184,.2);border-radius:16px;padding:1.2rem 1.2rem 1.4rem;box-shadow:0 24px 70px rgba(0,0,0,.6);transform:rotateY(85deg) scale(.9);opacity:0;transform-origin:center;transition:transform .5s cubic-bezier(.2,.8,.25,1),opacity .35s;margin:auto}
+.spec-overlay.in .spec-card{transform:rotateY(0) scale(1);opacity:1}
+.spec-close{position:absolute;top:.7rem;right:.7rem;width:32px;height:32px;border-radius:999px;background:#1f2937;color:#cbd5e1;border:none;font-size:.95rem;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
+.spec-name{font-size:1.5rem;font-weight:900;color:#fff;line-height:1.1}
+.spec-label{font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:#6b7280;font-weight:800;margin:1rem 0 .4rem}
+.spec-skill{display:inline-block;font-size:.72rem;font-weight:800;padding:.18rem .6rem;border-radius:999px;color:#0b1120}
+.hooks{display:flex;flex-wrap:wrap;gap:.9rem;align-items:flex-end}
+.hookitem{display:flex;flex-direction:column;align-items:center;gap:.2rem}
+.hookitem span{font-size:.7rem;color:#9ca3af;font-weight:700}
+.hookitem svg{display:block}
+.spec-card ul{margin:.2rem 0 .2rem 1.05rem;padding:0}
+.spec-card li{margin:.25rem 0;font-size:.85rem;color:#cbd5e1;line-height:1.45}
+@media(prefers-reduced-motion:reduce){.spec-card{transition:opacity .3s}}
 </style>
 </head>
 
@@ -217,8 +244,25 @@ button:active,.tbtn:active{transform:scale(.95)}
 <div id="libraryScreen" style="display:none;">
 <div class="card">
 <h2>Fly Library</h2>
+<div class="lib-toolbar">
+<input id="libSearch" class="lib-search" type="search" placeholder="Search flies…" autocomplete="off"/>
+<div class="lib-chips" id="libChips">
+<button class="chip sel" data-type="all" type="button">All</button>
+<button class="chip" data-type="nymph" type="button">Nymphs</button>
+<button class="chip" data-type="dry" type="button">Dries</button>
+<button class="chip" data-type="streamer" type="button">Streamers</button>
+</div>
+</div>
 <div id="library" class="row row-2"></div>
+<div id="libEmpty">No flies match — try a different search or filter.</div>
 <button id="backBtn" style="margin-top:1rem;">Back</button>
+</div>
+</div>
+
+<div id="specOverlay" class="spec-overlay" style="display:none;">
+<div class="spec-card">
+<button class="spec-close" id="specClose" aria-label="Close">✕</button>
+<div id="specBody"></div>
 </div>
 </div>
 
@@ -585,27 +629,110 @@ const regionCard=document.getElementById("regionCard");
 const conditionsCard=document.getElementById("conditionsCard");
 const resultsCard=document.getElementById("resultsCard");
 
+/* ---- Library: engine-derived tags, filtering, flip-to-spec ---- */
+const TAG_LABEL={
+ "clarity:clear":"Clear water","clarity:slightly_coloured":"Tinted water","clarity:dirty":"Dirty water",
+ "flow:low":"Low flow","flow:high":"High flow",
+ "riverTrend:rising":"Rising river","riverTrend:dropping":"Dropping water",
+ "rising:yes":"Rising fish","rising:no":"No rises",
+ "waterTemp:cold":"Cold water","waterTemp:warm":"Warm water","waterTemp:mild":"Mild water",
+ "sky:sunny":"Bright sun","sky:cloudy":"Cloud","sky:overcast":"Overcast",
+ "wind:calm":"Calm","wind:breezy":"Breeze","wind:windy":"Wind",
+ "waterType:river":"Rivers","waterType:lake":"Lakes","waterType:canal":"Canals",
+ "structure:riffle":"Riffles","structure:run":"Runs","structure:pool":"Pools","structure:bank":"Undercut banks","structure:edge":"Lake edges",
+ "behaviour:chasing":"Chasing bait","behaviour:deep":"Fish deep","behaviour:cruising":"Cruisers",
+ "hatch:mayfly":"Mayfly hatch","hatch:caddis":"Caddis hatch","hatch:midge":"Midge hatch","hatch:damsel":"Damsel hatch",
+ "time:dawn":"Dawn","time:morning":"Morning","time:midday":"Midday","time:evening":"Evening","time:night":"Night"
+};
+const TAG_DIMS={clarity:["clear","slightly_coloured","dirty"],flow:["low","high"],riverTrend:["rising","dropping"],rising:["yes","no"],waterTemp:["cold","warm","mild"],sky:["sunny","cloudy","overcast"],wind:["calm","breezy","windy"],waterType:["river","lake","canal"],structure:["riffle","run","pool","bank","edge"],behaviour:["chasing","deep","cruising"],hatch:["mayfly","caddis","midge","damsel"],time:["dawn","morning","midday","evening","night"]};
+function blankCond(){return {region:"",waterType:"",clarity:"",flow:"",rising:"",waterTemp:"",sky:"",wind:"",riverTrend:"",hatch:"",structure:"",behaviour:"",time:""};}
+function bestTags(f){
+  const res=[];
+  Object.keys(TAG_DIMS).forEach(dim=>TAG_DIMS[dim].forEach(opt=>{
+    const c=blankCond(); c[dim]=opt;
+    const sc=evalFly(f,c).score;
+    if(sc>=2){ const lab=TAG_LABEL[dim+":"+opt]; if(lab)res.push({lab,pts:sc}); }
+  }));
+  res.sort((a,b)=>b.pts-a.pts);
+  const seen=new Set(),out=[];
+  for(const r of res){ if(!seen.has(r.lab)){seen.add(r.lab);out.push(r.lab);} }
+  return out.slice(0,5);
+}
+function skillLevel(f){
+  if(f.type==="streamer"||f.subType==="attractor"||f.subType==="terrestrial") return {t:"Beginner-friendly",c:"#34d399"};
+  if(f.subType==="emerger"||(f.sizes[0]||0)>=16||["Pheasant Tail","Twilight Beauty","Willow Grub"].includes(f.name)) return {t:"Advanced",c:"#f87171"};
+  return {t:"Intermediate",c:"#fbbf24"};
+}
+function hookDiagram(sizes){
+  return '<div class="hooks">'+sizes.map(sz=>{
+    const L=Math.round(Math.max(18,Math.min(60,72-sz*2.6)));
+    return `<div class="hookitem"><svg width="${L}" height="${L}" viewBox="0 0 60 60"><g fill="none" stroke="#cbd5e1" stroke-width="3.5" stroke-linecap="round"><circle cx="17" cy="12" r="4.5"/><path d="M17 16 V40 q0 13 13 13 q11 0 11 -11"/></g></svg><span>#${sz}</span></div>`;
+  }).join('')+'</div>';
+}
+function tagsChips(list){return list.length?'<div class="btags">'+list.map(x=>`<span class="btag">${x}</span>`).join('')+'</div>':'';}
+
+let libType="all", libQuery="";
 function renderLibrary(){
-library.innerHTML="";
-FLIES.forEach(f=>{
-let d=document.createElement("div");
-d.className="fly-card";
-d.innerHTML=`<div class="fly-name">${f.name}</div>
+  library.innerHTML="";
+  FLIES.forEach(f=>{
+    const d=document.createElement("div");
+    d.className="fly-card lib";
+    d.dataset.type=f.type; d.dataset.name=f.name.toLowerCase(); d.dataset.sub=f.subType.toLowerCase();
+    d.innerHTML=`<div class="fly-name">${f.name}</div>
 <div class="fly-type">${f.type} • ${f.subType}</div>
 <div class="small">Sizes: ${f.sizes.join(", ")}</div>
-${detailsHtml(f)}`;
-const det=d.querySelector("details");
-if(det){
-  const sum=det.querySelector("summary");
-  if(sum) sum.addEventListener("click",e=>e.preventDefault());  /* let the tile handle the toggle */
-  d.addEventListener("click",()=>{ det.open=!det.open; });
-  d.style.cursor="pointer";
+${tagsChips(bestTags(f))}
+<div class="spec-hint">Tap for full spec ›</div>`;
+    d.addEventListener("click",()=>openSpec(f));
+    library.appendChild(d);
+  });
+  filterLibrary();
 }
-library.appendChild(d);
-});
+function filterLibrary(){
+  const q=libQuery.toLowerCase(); let i=0;
+  document.querySelectorAll("#library .fly-card").forEach(card=>{
+    const match=(libType==="all"||card.dataset.type===libType)&&(!q||card.dataset.name.includes(q)||card.dataset.type.includes(q)||card.dataset.sub.includes(q));
+    if(match){ card.style.display=""; card.classList.remove("anim"); void card.offsetWidth; card.style.animationDelay=(i*0.03).toFixed(2)+"s"; card.classList.add("anim"); i++; }
+    else card.style.display="none";
+  });
+  const empty=document.getElementById("libEmpty"); if(empty)empty.style.display=i?"none":"block";
+}
+function setupLibraryControls(){
+  const s=document.getElementById("libSearch"), chips=document.getElementById("libChips");
+  if(s&&!s.dataset.bound){ s.dataset.bound="1"; s.addEventListener("input",()=>{ libQuery=s.value||""; filterLibrary(); }); }
+  if(chips&&!chips.dataset.bound){ chips.dataset.bound="1";
+    chips.addEventListener("click",(e)=>{ const b=e.target.closest(".chip"); if(!b)return; libType=b.dataset.type; chips.querySelectorAll(".chip").forEach(c=>c.classList.toggle("sel",c===b)); filterLibrary(); if(navigator.vibrate)navigator.vibrate(8); });
+  }
+}
+function openSpec(f){
+  const ov=document.getElementById("specOverlay"), body=document.getElementById("specBody");
+  if(!ov||!body) return;
+  const sk=skillLevel(f), tips=f.tips.map(t=>`<li>${t}</li>`).join(""), tags=bestTags(f);
+  body.innerHTML=`
+<div class="spec-name">${f.name}</div>
+<div class="fly-type" style="margin-top:.15rem">${f.type} • ${f.subType}</div>
+<div style="margin-top:.6rem"><span class="spec-skill" style="background:${sk.c}">${sk.t}</span></div>
+<div class="spec-label">Hook sizes (to scale)</div>${hookDiagram(f.sizes)}
+${tags.length?'<div class="spec-label">Best in these conditions</div>'+tagsChips(tags):''}
+<div class="spec-label">Fly details</div><ul>${tips}</ul>
+<div class="spec-label">How to fish a ${f.type}</div><div class="howto">${TYPE_GUIDE[f.type]||""}</div>`;
+  /* bind close freshly every open so it never depends on init having run */
+  const cb=document.getElementById("specClose");
+  if(cb) cb.onclick=(ev)=>{ ev.stopPropagation(); closeSpec(); };
+  ov.onclick=(ev)=>{ if(ev.target===ov) closeSpec(); };
+  ov.style.display="flex"; void ov.offsetWidth; ov.classList.add("in");
+  if(navigator.vibrate)navigator.vibrate(10);
+}
+function closeSpec(){ const ov=document.getElementById("specOverlay"); if(!ov)return; ov.classList.remove("in"); setTimeout(()=>{ ov.style.display="none"; },300); }
+function initSpec(){
+  const ov=document.getElementById("specOverlay"), close=document.getElementById("specClose");
+  if(close&&!close.dataset.bound){ close.dataset.bound="1"; close.addEventListener("click",closeSpec); }
+  if(ov&&!ov.dataset.bound){ ov.dataset.bound="1"; ov.addEventListener("click",(e)=>{ if(e.target===ov)closeSpec(); }); }
+  document.addEventListener("keydown",(e)=>{ if(e.key==="Escape")closeSpec(); });
 }
 
 function openLibrary(){
+  const sw=document.getElementById("sceneWrap"); if(sw)sw.style.display="none";
   if(regionCard)regionCard.style.display="none";
   conditionsCard.style.display="none";
   resultsCard.style.display="none";
@@ -614,6 +741,7 @@ function openLibrary(){
   renderLibrary();
 }
 function closeLibrary(){
+  const sw=document.getElementById("sceneWrap"); if(sw)sw.style.display="";
   libraryScreen.style.display="none";
   if(regionCard)regionCard.style.display="block";
   conditionsCard.style.display="block";
@@ -706,14 +834,9 @@ ${i===0?'<div class="hero-badge">★ Top pick for these conditions</div>':''}
 <div class="small">Sizes: ${r.fly.sizes.join(", ")}</div>
 ${conf}
 ${whyHtml}
-${detailsHtml(r.fly)}`;
-      const det=d.querySelector("details");
-      if(det){
-        const sum=det.querySelector("summary");
-        if(sum) sum.addEventListener("click",e=>e.preventDefault());  /* let the card handle the toggle */
-        d.addEventListener("click",()=>{ det.open=!det.open; });
-        d.style.cursor="pointer";
-      }
+<div class="spec-hint">Tap for full spec ›</div>`;
+      d.style.cursor="pointer";
+      d.addEventListener("click",()=>openSpec(r.fly));
       out.appendChild(d);
     });
 
@@ -899,6 +1022,8 @@ function initParallax(){
   initRipples();
   initParallax();
   initSplash();
+  setupLibraryControls();
+  initSpec();
   updateTimeOfDayDisplay();
   locateMe();
   const btn=document.getElementById("recommendBtn");
@@ -936,7 +1061,7 @@ if("serviceWorker" in navigator){
   const isMobile=/android|iphone|ipad|ipod|mobile/i.test(ua) || (navigator.maxTouchPoints>1 && window.matchMedia && window.matchMedia("(pointer:coarse)").matches);
   /* Tie the "permanently dismissed" state to the release version, so a new release re-shows
      the install dialog. Bump APP_VERSION in lockstep with the sw.js cache version. */
-  const APP_VERSION="v15";
+  const APP_VERSION="v20";
   const dismissed = lsGet("ff_install_dismissed")===APP_VERSION;
 
   let deferred=null;
@@ -955,14 +1080,14 @@ if("serviceWorker" in navigator){
   /* only this permanently stops the dialog */
   if(iosDontShow) iosDontShow.addEventListener("click",()=>{ hideSheet(); lsSet("ff_install_dismissed",APP_VERSION); });
 
-  /* "Install app" link: Android mobile only — hidden on iOS and desktop */
-  if(link && isMobile && !isIOS) link.style.display="";
+  /* The "Install app" link is revealed once the browser signals installability (desktop + Android). */
 
-  /* Android Chromium capture the native prompt (mobile only — no desktop auto-pop) */
+  /* Capture the native install prompt — fires on desktop Chrome/Edge (Windows 11) AND Android */
   window.addEventListener("beforeinstallprompt",(e)=>{
     e.preventDefault();
     deferred=e;
-    if(!dismissed && bar && isMobile){ txt.textContent="Install NZ Fly Finder for one-tap access and offline use."; if(ibInstall)ibInstall.style.display=""; showBar(); }
+    if(link && !isIOS) link.style.display="";
+    if(!dismissed && bar){ txt.textContent="Install NZ Fly Finder for quick access and offline use."; if(ibInstall)ibInstall.style.display=""; showBar(); }
   });
 
   async function doInstall(){
