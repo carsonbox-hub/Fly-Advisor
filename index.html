@@ -667,7 +667,7 @@ if("serviceWorker" in navigator){
   const isMobile=/android|iphone|ipad|ipod|mobile/i.test(ua) || (navigator.maxTouchPoints>1 && window.matchMedia && window.matchMedia("(pointer:coarse)").matches);
   /* Tie the "permanently dismissed" state to the release version, so a new release re-shows
      the install dialog. Bump APP_VERSION in lockstep with the sw.js cache version. */
-  const APP_VERSION="v12";
+  const APP_VERSION="v13";
   const dismissed = lsGet("ff_install_dismissed")===APP_VERSION;
 
   let deferred=null;
