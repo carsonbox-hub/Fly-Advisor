@@ -61,6 +61,22 @@ details li{margin:.2rem 0;font-size:.82rem;color:#cbd5e1;line-height:1.4}
 .install-bar .ib-text{flex:1;font-size:.82rem;color:#e5e7eb;line-height:1.35}
 .install-bar .ib-install{width:auto;flex:0 0 auto;padding:.4rem .8rem;font-size:.82rem}
 .install-bar .ib-close{width:auto;flex:0 0 auto;background:transparent;color:#9ca3af;border:none;font-size:1.05rem;cursor:pointer;padding:.1rem .3rem}
+
+/* iOS NATIVE-STYLE INSTALL SHEET */
+.ios-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;display:flex;align-items:flex-end;justify-content:center}
+.ios-card{position:relative;width:100%;max-width:430px;background:#1c1c1e;color:#fff;border-radius:16px 16px 0 0;padding:.6rem 1.1rem calc(1.3rem + env(safe-area-inset-bottom,0px));box-shadow:0 -8px 30px rgba(0,0,0,.55);font-family:-apple-system,system-ui,sans-serif}
+.ios-grabber{width:38px;height:5px;border-radius:999px;background:#48484a;margin:.2rem auto .9rem}
+.ios-close{position:absolute;top:.85rem;right:.85rem;width:28px;height:28px;background:#2c2c2e;color:#aeaeb2;border:none;border-radius:999px;font-size:.85rem;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
+.ios-head{display:flex;align-items:center;gap:.8rem;margin-bottom:1.1rem}
+.ios-appicon{width:58px;height:58px;border-radius:13px;flex:none;box-shadow:0 1px 5px rgba(0,0,0,.45)}
+.ios-appname{font-size:1.1rem;font-weight:700;line-height:1.2}
+.ios-appsub{font-size:.83rem;color:#aeaeb2;margin-top:.1rem}
+.ios-steps{margin:0;padding:0 0 0 1.4rem;display:flex;flex-direction:column;gap:.75rem}
+.ios-steps li{font-size:.98rem;line-height:1.5;color:#f2f2f7}
+.ios-steps li::marker{color:#8e8e93;font-weight:600}
+.ios-ic{display:inline-flex;width:22px;height:22px;vertical-align:-5px;margin:0 .12rem}
+.ios-ic svg{width:20px;height:20px}
+.ios-arrow{text-align:center;color:#0a84ff;font-size:1.5rem;line-height:1;margin-top:.7rem}
 </style>
 </head>
 
@@ -71,6 +87,27 @@ details li{margin:.2rem 0;font-size:.82rem;color:#cbd5e1;line-height:1.4}
 <div class="ib-text" id="ibText"></div>
 <button id="ibInstall" class="ib-install" style="display:none;">Install</button>
 <button id="ibClose" class="ib-close" aria-label="Dismiss">✕</button>
+</div>
+
+<div id="iosSheet" class="ios-overlay" style="display:none;">
+<div class="ios-card">
+<div class="ios-grabber"></div>
+<button id="iosClose" class="ios-close" aria-label="Close">✕</button>
+<div class="ios-head">
+<img src="apple-touch-icon.png" alt="" class="ios-appicon"/>
+<div>
+<div class="ios-appname">NZ Fly Finder</div>
+<div class="ios-appsub">Install on your iPhone</div>
+</div>
+</div>
+<ol class="ios-steps">
+<li>Tap <span class="ios-ic"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="5" stroke="#0a84ff" stroke-width="2"/><circle cx="8" cy="12" r="1.5" fill="#0a84ff"/><circle cx="12" cy="12" r="1.5" fill="#0a84ff"/><circle cx="16" cy="12" r="1.5" fill="#0a84ff"/></svg></span></li>
+<li>Tap <span class="ios-ic"><svg viewBox="0 0 24 24" fill="none" stroke="#0a84ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4"/><path d="M8.5 7.5 12 4l3.5 3.5"/><path d="M7 11H5.5V20h13V11H17"/></svg></span> <b>Share</b></li>
+<li>Tap <span class="ios-ic"><svg viewBox="0 0 24 24" fill="none" stroke="#0a84ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span> <b>View More</b></li>
+<li>Tap <span class="ios-ic"><svg viewBox="0 0 24 24" fill="none" stroke="#0a84ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M12 8.5v7M8.5 12h7"/></svg></span> <b>Add to Home Screen</b></li>
+</ol>
+<div class="ios-arrow">▾</div>
+</div>
 </div>
 
 <header>
@@ -99,9 +136,19 @@ details li{margin:.2rem 0;font-size:.82rem;color:#cbd5e1;line-height:1.4}
 
 <div class="row row-2">
 <div><label>Region</label><select id="region">
-<option value="otago">Otago</option><option value="southland">Southland</option>
-<option value="canterbury">Canterbury</option><option value="westcoast">West Coast</option>
-<option value="taupo">Taupō</option><option value="rotorua">Rotorua</option>
+<option value="northland">Northland</option>
+<option value="aucklandwaikato">Auckland/Waikato</option>
+<option value="eastern">Eastern (Rotorua/BoP)</option>
+<option value="taupo">Taupō</option>
+<option value="hawkesbay">Hawke's Bay</option>
+<option value="taranaki">Taranaki</option>
+<option value="wellington">Wellington</option>
+<option value="nelsonmarlborough">Nelson/Marlborough</option>
+<option value="westcoast">West Coast</option>
+<option value="northcanterbury">North Canterbury</option>
+<option value="centralsouth">Central South Island</option>
+<option value="otago">Otago</option>
+<option value="southland">Southland</option>
 </select>
 <div id="geoStatus" class="small" style="margin-top:.3rem;"></div>
 </div>
@@ -150,11 +197,21 @@ let USER_COORDS=null;                         /* {lat,lon} once the user shares 
 
 /* Approx centroids of each fishing region for nearest-match */
 const REGION_PTS=[
-  ["otago",-45.25,169.40],["southland",-46.00,168.50],
-  ["canterbury",-43.60,171.60],["westcoast",-42.70,171.00],
-  ["taupo",-38.69,176.08],["rotorua",-38.14,176.25]
+  ["northland",-35.40,173.90],
+  ["aucklandwaikato",-37.60,175.20],
+  ["eastern",-38.10,176.40],
+  ["taupo",-38.80,175.90],
+  ["hawkesbay",-39.50,176.60],
+  ["taranaki",-39.30,174.20],
+  ["wellington",-40.80,175.60],
+  ["nelsonmarlborough",-41.50,173.50],
+  ["westcoast",-42.70,171.00],
+  ["northcanterbury",-43.20,172.30],
+  ["centralsouth",-44.00,170.20],
+  ["otago",-45.30,169.60],
+  ["southland",-46.00,168.40]
 ];
-const REGION_NAME={otago:"Otago",southland:"Southland",canterbury:"Canterbury",westcoast:"West Coast",taupo:"Taupō",rotorua:"Rotorua"};
+const REGION_NAME={northland:"Northland",aucklandwaikato:"Auckland/Waikato",eastern:"Eastern",taupo:"Taupō",hawkesbay:"Hawke's Bay",taranaki:"Taranaki",wellington:"Wellington",nelsonmarlborough:"Nelson/Marlborough",westcoast:"West Coast",northcanterbury:"North Canterbury",centralsouth:"Central South Island",otago:"Otago",southland:"Southland"};
 
 function haversine(a1,o1,a2,o2){const R=6371,r=Math.PI/180;const dLat=(a2-a1)*r,dLon=(o2-o1)*r;const s=Math.sin(dLat/2)**2+Math.cos(a1*r)*Math.cos(a2*r)*Math.sin(dLon/2)**2;return 2*R*Math.asin(Math.sqrt(s));}
 function nearestRegion(lat,lon){let best=null,bd=Infinity;REGION_PTS.forEach(([v,a,o])=>{const d=haversine(lat,lon,a,o);if(d<bd){bd=d;best=v;}});return {region:best,km:bd};}
@@ -281,7 +338,19 @@ const FLIES=[
 {name:"Pine Squirrel Leech",type:"streamer",subType:"leech",sizes:[8,10],tips:["Crawl it slowly to imitate a swimming leech.","Best in cold water when fish won't chase a fast fly.","A reliable lake pattern fished on an intermediate line."]},
 {name:"CDC Emerger",type:"dry",subType:"emerger",sizes:[14,16],tips:["Sits right in the surface film like a hatching mayfly — the stage selective fish key on.","Fish it on fine tippet during the evening rise.","Grease the body but leave the CDC wing dry so it hangs naturally."]},
 {name:"Blowfly Dry",type:"dry",subType:"terrestrial",sizes:[10,12],tips:["Imitates the blowflies that pester fish on hot summer days.","Fish it on a natural, drag-free drift tight to the bank.","Comes into its own when wind is putting terrestrials on the water."]},
-{name:"Klinkhammer",type:"dry",subType:"emerger",sizes:[12,14],tips:["The angled body hangs the abdomen below the film like an emerging insect.","The high para-post is very visible — also a great dry-dropper indicator.","Fish a long leader to wary, surface-feeding trout."]}
+{name:"Klinkhammer",type:"dry",subType:"emerger",sizes:[12,14],tips:["The angled body hangs the abdomen below the film like an emerging insect.","The high para-post is very visible — also a great dry-dropper indicator.","Fish a long leader to wary, surface-feeding trout."]},
+{name:"Twilight Beauty",type:"dry",subType:"mayfly",sizes:[14,16,18],tips:["A classic NZ dark mayfly dun — superb through the evening rise.","Matches the duns and spinners on Mataura-style southern rivers.","Fish fine tippet and a drag-free drift to sipping browns."]},
+{name:"Kakahi Queen",type:"dry",subType:"emerger",sizes:[14,16],tips:["A traditional central North Island pattern imitating a hatching mayfly.","Deadly on Taupō-district rivers during a mayfly hatch.","Fish it low in the film on a light tippet."]},
+{name:"Dad's Favourite",type:"dry",subType:"mayfly",sizes:[14,16],tips:["An old-school NZ general mayfly dry that still fools fish everywhere.","Use it as a searching dry over likely runs and riffles.","Carry a couple of sizes to match the hatch."]},
+{name:"Coch-y-Bondhu",type:"dry",subType:"terrestrial",sizes:[12,14],tips:["A peacock-and-red beetle imitation for bright, warm days.","Plop it close to grassy banks and let it sit dead-still.","A great pattern when trout are looking up for beetles."]},
+{name:"Willow Grub",type:"dry",subType:"terrestrial",sizes:[16,18],tips:["A tiny pale grub imitation for slow, clear summer water.","Essential when trout sip willow grubs under overhanging trees.","Demands a delicate cast and a perfect drift — pure sight fishing."]},
+{name:"Mrs Simpson",type:"streamer",subType:"lure",sizes:[4,6,8],tips:["An iconic NZ lure — fish it on a slow strip through lake margins and pools.","Brilliant for cruising lake trout and stirred-up water.","Work it deep on a sinking line with a slow figure-eight retrieve."]},
+{name:"Hamill's Killer",type:"streamer",subType:"lure",sizes:[4,6,8],tips:["A famous green-and-pheasant NZ stillwater lure.","Retrieve it slowly along weed beds and drop-offs.","A staple for Rotorua and Taupō-district lakes."]},
+{name:"Grey Ghost",type:"streamer",subType:"baitfish",sizes:[4,6],tips:["A slim smelt imitation for lake river-mouths (the 'rip').","Strip it fast to mimic a fleeing smelt at first and last light.","A Taupō and Rotorua rip classic."]},
+{name:"Parsons' Glory",type:"streamer",subType:"lure",sizes:[4,6],tips:["A traditional Taupō lure in orange and grizzle.","Swing or strip it through tributary pools and rips.","Works on a wet-fly swing as well as a straight retrieve."]},
+{name:"Fuzzy Wuzzy",type:"streamer",subType:"lure",sizes:[6,8],tips:["A heavily-dressed black-and-red NZ lure for coloured water.","Great on the West Coast after rain and in discoloured lakes.","Strip it on a sink-tip through stained runs."]},
+{name:"Bloodworm",type:"nymph",subType:"midge",sizes:[12,14],tips:["A slim red midge-larva imitation for deep, slow water.","A hydro-canal staple — fish it deep and dead-slow under an indicator.","Trophy canal browns sip these subtly, so watch the indicator closely."]},
+{name:"Cased Caddis",type:"nymph",subType:"caddis",sizes:[10,12],tips:["Imitates a caddis larva in its stick-and-gravel case.","Roll it along the bottom of riffles and runs as the anchor fly.","A reliable searching nymph wherever caddis are present."]}
 ];
 
 function detailsHtml(f){
@@ -375,13 +444,21 @@ if(c.structure==="pool"){ if(isStreamer)add(3,"Pool depth → streamer"); if(isN
 if(c.structure==="bank"){ if(sub==="terrestrial")add(4,"Undercut bank → terrestrial"); if(isStreamer)add(2,"Bank ambush → streamer"); }
 if(c.structure==="edge"){ if(f.name==="Damsel Nymph")add(3,"Lake edge → damsel"); if(sub==="terrestrial")add(3,"Lake edge → terrestrial"); if(["Booby Fly","Pine Squirrel Leech"].includes(f.name))add(2,"Lake edge → booby/leech"); }
 
-/* REGION (NZ) */
-if(c.region==="otago"&&["Pheasant Tail","Hare & Copper","Parachute Adams","Green Beetle","Foam Cicada"].includes(f.name))add(2,"Otago favourite");
-if(c.region==="southland"&&["Humpy","Royal Wulff","Olive Woolly Bugger","Black Woolly Bugger"].includes(f.name))add(2,"Southland favourite");
-if(c.region==="canterbury"&&["Hare & Copper","Pheasant Tail","Stonefly Bomb","Royal Wulff"].includes(f.name))add(2,"Canterbury braided-river pick");
-if(c.region==="westcoast"&&["Olive Woolly Bugger","Black Woolly Bugger","Foam Cicada","Humpy"].includes(f.name))add(2,"West Coast coloured-water pick");
-if(c.region==="taupo"&&["Glo-bug Egg","Red Setter","Zebra Midge","Rabbit Zonker"].includes(f.name))add(3,"Taupō classic");
-if(c.region==="rotorua"&&["Booby Fly","Rabbit Zonker","Damsel Nymph","Olive Woolly Bugger"].includes(f.name))add(2,"Rotorua lake pick");
+/* REGION (NZ — the 12 Fish & Game regions + DOC-managed Taupō) */
+if(c.region==="northland"&&["Hare & Copper","Olive Woolly Bugger","Green Beetle","Adams","Mrs Simpson"].includes(f.name))add(2,"Northland pick");
+if(c.region==="aucklandwaikato"&&["Hare & Copper","Pheasant Tail","Olive Woolly Bugger","Damsel Nymph","Hamill's Killer","Mrs Simpson"].includes(f.name))add(2,"Auckland/Waikato pick");
+if(c.region==="eastern"&&["Booby Fly","Rabbit Zonker","Mrs Simpson","Hamill's Killer","Grey Ghost","Damsel Nymph","Glo-bug Egg"].includes(f.name))add(2,"Eastern (Rotorua/BoP) lake pick");
+if(c.region==="taupo"&&["Glo-bug Egg","Red Setter","Zebra Midge","Rabbit Zonker","Grey Ghost","Parsons' Glory","Mrs Simpson","Kakahi Queen"].includes(f.name))add(3,"Taupō classic");
+if(c.region==="hawkesbay"&&["Pheasant Tail","Hare & Copper","Parachute Adams","Foam Cicada","Twilight Beauty","Willow Grub"].includes(f.name))add(2,"Hawke's Bay pick");
+if(c.region==="taranaki"&&["Hare & Copper","Pheasant Tail","Adams","Elk Hair Caddis","Dad's Favourite","Kakahi Queen"].includes(f.name))add(2,"Taranaki pick");
+if(c.region==="wellington"&&["Hare & Copper","Pheasant Tail","Parachute Adams","Royal Wulff","Dad's Favourite","Twilight Beauty"].includes(f.name))add(2,"Wellington pick");
+if(c.region==="nelsonmarlborough"&&["Pheasant Tail","Parachute Adams","Foam Cicada","Green Beetle","Gold-Ribbed Hare’s Ear","Coch-y-Bondhu","Cased Caddis","Dad's Favourite"].includes(f.name))add(2,"Nelson/Marlborough sight-fishing pick");
+if(c.region==="westcoast"&&["Olive Woolly Bugger","Black Woolly Bugger","Foam Cicada","Humpy","Fuzzy Wuzzy","Mrs Simpson"].includes(f.name))add(2,"West Coast coloured-water pick");
+if(c.region==="northcanterbury"&&["Hare & Copper","Pheasant Tail","Stonefly Bomb","Royal Wulff","Cased Caddis","Willow Grub"].includes(f.name))add(2,"North Canterbury braided-river pick");
+if(c.region==="centralsouth"&&["Glo-bug Egg","Zebra Midge","Booby Fly","Bloodworm"].includes(f.name))add(3,"Central South Island canal pick");
+if(c.region==="centralsouth"&&["Hare & Copper","Stonefly Bomb","Pheasant Tail","Cased Caddis"].includes(f.name))add(2,"Central South Island braided-river pick");
+if(c.region==="otago"&&["Pheasant Tail","Hare & Copper","Parachute Adams","Green Beetle","Foam Cicada","Twilight Beauty","Willow Grub","Coch-y-Bondhu"].includes(f.name))add(2,"Otago favourite");
+if(c.region==="southland"&&["Adams","Parachute Adams","Pheasant Tail","CDC Emerger","Hare & Copper","Twilight Beauty","Dad's Favourite","Kakahi Queen"].includes(f.name))add(2,"Southland mayfly pick");
 
 return {score:s, reasons};
 }
@@ -570,7 +647,14 @@ if("serviceWorker" in navigator){
   let deferred=null;
   const showBar=()=>{ if(bar)bar.style.display="flex"; };
   const hideBar=()=>{ if(bar)bar.style.display="none"; };
-  function iosNote(){ if(txt)txt.innerHTML="To install: tap the <b>Share</b> icon (the square with an up-arrow), then <b>Add to Home Screen</b>."; if(ibInstall)ibInstall.style.display="none"; showBar(); }
+
+  /* iOS native-style install sheet */
+  const sheet=document.getElementById("iosSheet");
+  const iosClose=document.getElementById("iosClose");
+  const showSheet=()=>{ if(sheet)sheet.style.display="flex"; };
+  const hideSheet=()=>{ if(sheet)sheet.style.display="none"; };
+  if(iosClose) iosClose.addEventListener("click",()=>{ hideSheet(); lsSet("ff_install_dismissed","1"); });
+  if(sheet) sheet.addEventListener("click",(e)=>{ if(e.target===sheet){ hideSheet(); lsSet("ff_install_dismissed","1"); } });
 
   /* permanent link: mobile only (when not installed) */
   if(link && isMobile) link.style.display="";
@@ -584,17 +668,17 @@ if("serviceWorker" in navigator){
 
   async function doInstall(){
     if(deferred){ deferred.prompt(); try{ await deferred.userChoice; }catch(e){} deferred=null; hideBar(); return; }
-    if(isIOSSafari){ iosNote(); return; }
+    if(isIOSSafari){ showSheet(); return; }
     if(txt){ txt.innerHTML="To install, open your browser menu and choose <b>Install</b> or <b>Add to Home Screen</b>."; if(ibInstall)ibInstall.style.display="none"; showBar(); }
   }
 
   if(ibInstall) ibInstall.addEventListener("click",doInstall);
   if(link) link.addEventListener("click",(e)=>{ e.preventDefault(); doInstall(); });
   if(ibClose) ibClose.addEventListener("click",()=>{ hideBar(); lsSet("ff_install_dismissed","1"); });
-  window.addEventListener("appinstalled",()=>{ hideBar(); if(link)link.style.display="none"; lsSet("ff_install_dismissed","1"); });
+  window.addEventListener("appinstalled",()=>{ hideBar(); hideSheet(); if(link)link.style.display="none"; lsSet("ff_install_dismissed","1"); });
 
-  /* iOS Safari has no install API — auto-show steps on first visit */
-  if(isIOSSafari && !dismissed){ iosNote(); }
+  /* iOS Safari has no install API — auto-show the native-style sheet on first visit */
+  if(isIOSSafari && !dismissed){ showSheet(); }
 })();
 </script>
 
