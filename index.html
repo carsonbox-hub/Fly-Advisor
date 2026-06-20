@@ -2,8 +2,18 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
 <title>NZ Fly Finder</title>
+
+<!-- PWA -->
+<link rel="manifest" href="manifest.json"/>
+<meta name="theme-color" content="#22c55e"/>
+<link rel="apple-touch-icon" href="apple-touch-icon.png"/>
+<meta name="application-name" content="Fly Finder"/>
+<meta name="apple-mobile-web-app-title" content="Fly Finder"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 
 <style>
 body{margin:0;font-family:system-ui,sans-serif;background:#020617;color:#e5e7eb;display:flex;justify-content:center;min-height:100vh}
@@ -21,6 +31,30 @@ button{background:#22c55e;color:#022c22;font-weight:700;cursor:pointer;border:no
 .fly-card{background:#020617;border-radius:.75rem;padding:.75rem;border:1px solid rgba(148,163,184,.3)}
 .fly-name{font-weight:700;font-size:1rem}.fly-type,.small{font-size:.8rem;color:#9ca3af}
 .tag{font-size:.7rem;padding:.1rem .4rem;border-radius:999px;border:1px solid rgba(148,163,184,.6);font-weight:700}
+.status{font-size:.78rem;color:#6b7280;margin:.25rem 0 .75rem}
+.errbox{background:#450a0a;border:1px solid #b91c1c;color:#fecaca;border-radius:.5rem;padding:.6rem .7rem;font-size:.82rem;white-space:pre-wrap;margin-bottom:.5rem}
+
+/* WHY + EXPANDED TIPS */
+.why{font-size:.78rem;color:#86efac;margin:.4rem 0 .15rem;line-height:1.4}
+.howto{font-size:.82rem;color:#cbd5e1;margin:.45rem 0 .35rem;line-height:1.45}
+summary{cursor:pointer;font-size:.85rem;color:#cbd5e1;margin-top:.35rem}
+details ul{margin:.35rem 0 .15rem 1.05rem;padding:0}
+details li{margin:.2rem 0;font-size:.82rem;color:#9ca3af;line-height:1.4}
+
+/* TOGGLE BUTTON GROUPS */
+.toggle{display:flex;flex-wrap:wrap;gap:.35rem}
+.tbtn{width:auto;flex:0 0 auto;padding:.45rem .6rem;background:#020617;color:#cbd5e1;border:1px solid #1f2937;border-radius:.5rem;font-weight:600;font-size:.8rem;display:inline-flex;align-items:center;justify-content:center;gap:.3rem;cursor:pointer;white-space:nowrap}
+.tbtn .ti{font-size:1rem;line-height:1}
+.tbtn.sel{background:#22c55e;color:#022c22;border-color:#22c55e}
+.tbtn:focus-visible{outline:2px solid #22c55e;outline-offset:2px}
+
+/* CSS MEDALS — ribbon + struck medallion */
+.medal{position:relative;display:inline-block;width:34px;height:48px;flex:none}
+.medal .ribbon{position:absolute;top:0;left:50%;transform:translateX(-50%);width:24px;height:30px;clip-path:polygon(0 0,100% 0,100% 100%,50% 72%,0 100%);background:linear-gradient(90deg,#c0392b 0 33%,#eef2f3 33% 66%,#2563eb 66% 100%);box-shadow:0 1px 2px rgba(0,0,0,.45)}
+.medal .disc{position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:32px;height:32px;border-radius:999px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:1rem;border:2px solid rgba(0,0,0,.28);box-shadow:0 1px 3px rgba(0,0,0,.55),inset 0 0 0 3px rgba(255,255,255,.28),inset 0 -3px 5px rgba(0,0,0,.18)}
+.medal.gold .disc{background:radial-gradient(circle at 32% 28%,#fff6c0,#ffd84d 45%,#d4af37);color:#5a4400}
+.medal.silver .disc{background:radial-gradient(circle at 32% 28%,#ffffff,#dfe3e6 45%,#a8b0b6);color:#3a3f44}
+.medal.bronze .disc{background:radial-gradient(circle at 32% 28%,#f3d2ac,#d98c46 45%,#a45f2b);color:#3a2110}
 </style>
 </head>
 
@@ -54,64 +88,35 @@ button{background:#22c55e;color:#022c22;font-weight:700;cursor:pointer;border:no
 <option value="otago">Otago</option><option value="southland">Southland</option>
 <option value="canterbury">Canterbury</option><option value="westcoast">West Coast</option>
 <option value="taupo">Taupō</option><option value="rotorua">Rotorua</option>
-</select></div>
+</select>
+<div id="geoStatus" class="small" style="margin-top:.3rem;"></div>
+</div>
 
-<div><label>Water type</label><select id="waterType">
-<option value="river">River</option><option value="lake">Lake</option><option value="canal">Canal</option>
-</select></div>
+<div><label>Water type</label><div id="waterType"></div></div>
 </div>
 
 <div class="row row-3" style="margin-top:.75rem;">
-<div><label>Clarity</label><select id="clarity">
-<option value="clear">Clear</option><option value="slightly_coloured">Slightly coloured</option><option value="dirty">Dirty</option>
-</select></div>
-
-<div><label>Flow</label><select id="flow">
-<option value="normal">Normal</option><option value="low">Low</option><option value="high">High</option>
-</select></div>
-
-<div><label>Fish rising?</label><select id="rising">
-<option value="unsure">Unsure</option><option value="yes">Yes</option><option value="no">No</option>
-</select></div>
+<div><label>Clarity</label><div id="clarity"></div></div>
+<div><label>Flow</label><div id="flow"></div></div>
+<div><label>Fish rising?</label><div id="rising"></div></div>
 </div>
 
 <h2 style="margin-top:1rem;">Advanced</h2>
 
 <div class="row row-3">
-<div><label>Water temp</label><select id="waterTemp">
-<option value="cold">Cold</option><option value="mild">Mild</option><option value="warm">Warm</option>
-</select></div>
-
-<div><label>Sky</label><select id="sky">
-<option value="sunny">Sunny</option><option value="cloudy">Cloudy</option><option value="overcast">Overcast</option>
-</select></div>
-
-<div><label>Wind</label><select id="wind">
-<option value="calm">Calm</option><option value="breezy">Breezy</option><option value="windy">Windy</option>
-</select></div>
+<div><label>Water temp</label><div id="waterTemp"></div></div>
+<div><label>Sky</label><div id="sky"></div></div>
+<div><label>Wind</label><div id="wind"></div></div>
 </div>
 
 <div class="row row-3" style="margin-top:.75rem;">
-<div><label>River trend</label><select id="riverTrend">
-<option value="stable">Stable</option><option value="rising">Rising</option><option value="dropping">Dropping</option>
-</select></div>
-
-<div><label>Hatch</label><select id="hatch">
-<option value="none">None</option><option value="mayfly">Mayfly</option><option value="caddis">Caddis</option>
-<option value="midge">Midge</option><option value="damsel">Damsel</option>
-</select></div>
-
-<div><label>Structure</label><select id="structure">
-<option value="riffle">Riffle</option><option value="run">Run</option><option value="pool">Pool</option>
-<option value="bank">Undercut bank</option><option value="edge">Lake edge</option>
-</select></div>
+<div><label>River trend</label><div id="riverTrend"></div></div>
+<div><label>Hatch</label><div id="hatch"></div></div>
+<div><label>Structure</label><div id="structure"></div></div>
 </div>
 
 <div class="row row-2" style="margin-top:.75rem;">
-<div><label>Fish behaviour</label><select id="behaviour">
-<option value="unsure">Unsure</option><option value="chasing">Chasing bait</option>
-<option value="deep">Sitting deep</option><option value="cruising">Cruising edges</option>
-</select></div>
+<div><label>Fish behaviour</label><div id="behaviour"></div></div>
 </div>
 
 <button id="recommendBtn" style="margin-top:1rem;">Recommend flies</button>
@@ -119,114 +124,255 @@ button{background:#22c55e;color:#022c22;font-weight:700;cursor:pointer;border:no
 
 <section class="card" id="resultsCard">
 <h2>Recommended flies</h2>
+<div id="resultsStatus" class="status">Set your conditions and tap <b>Recommend flies</b>.</div>
 <div id="results" class="row row-2"></div>
 </section>
 
 </div>
 
 <script>
-/* TIME OF DAY */
-function labelTime(t){return{dawn:"Dawn",morning:"Morning",midday:"Midday",evening:"Evening",night:"Night"}[t]}
-function computeTimeOfDayFromClock(){let h=new Date().getHours();if(h>=4&&h<7)return"dawn";if(h>=7&&h<10)return"morning";if(h>=10&&h<16)return"midday";if(h>=16&&h<21)return"evening";return"night"}
-function updateTimeOfDayDisplay(){document.getElementById("timeOfDayDisplay").textContent="Time of day: "+labelTime(computeTimeOfDayFromClock())}
+/* ---------- LOCATION (optional, opt-in GPS) ---------- */
+let USER_COORDS=null;                         /* {lat,lon} once the user shares it; never sent anywhere */
 
-/* SAFE GETTER — THE INFINITE CLICK FIX */
-const safe = id => {
-  const el = document.getElementById(id);
-  return el ? el.value : "";
+/* Approx centroids of each fishing region for nearest-match */
+const REGION_PTS=[
+  ["otago",-45.25,169.40],["southland",-46.00,168.50],
+  ["canterbury",-43.60,171.60],["westcoast",-42.70,171.00],
+  ["taupo",-38.69,176.08],["rotorua",-38.14,176.25]
+];
+const REGION_NAME={otago:"Otago",southland:"Southland",canterbury:"Canterbury",westcoast:"West Coast",taupo:"Taupō",rotorua:"Rotorua"};
+
+function haversine(a1,o1,a2,o2){const R=6371,r=Math.PI/180;const dLat=(a2-a1)*r,dLon=(o2-o1)*r;const s=Math.sin(dLat/2)**2+Math.cos(a1*r)*Math.cos(a2*r)*Math.sin(dLon/2)**2;return 2*R*Math.asin(Math.sqrt(s));}
+function nearestRegion(lat,lon){let best=null,bd=Infinity;REGION_PTS.forEach(([v,a,o])=>{const d=haversine(lat,lon,a,o);if(d<bd){bd=d;best=v;}});return {region:best,km:bd};}
+
+/* Sunrise/sunset (Almanac algorithm) -> local decimal hours, on-device, no network */
+function sunTimes(date,lat,lon){
+  const rad=Math.PI/180,deg=180/Math.PI,zenith=90.833*rad,lngHour=lon/15;
+  const start=new Date(date.getFullYear(),0,0),dayOfYear=Math.floor((date-start)/86400000);
+  function calc(rise){
+    const t=dayOfYear+((rise?6:18)-lngHour)/24;
+    const M=(0.9856*t)-3.289;
+    let L=M+(1.916*Math.sin(M*rad))+(0.020*Math.sin(2*M*rad))+282.634;L=((L%360)+360)%360;
+    let RA=deg*Math.atan(0.91764*Math.tan(L*rad));RA=((RA%360)+360)%360;
+    RA=(RA+(Math.floor(L/90)*90-Math.floor(RA/90)*90))/15;
+    const sinDec=0.39782*Math.sin(L*rad),cosDec=Math.cos(Math.asin(sinDec));
+    const cosH=(Math.cos(zenith)-(sinDec*Math.sin(lat*rad)))/(cosDec*Math.cos(lat*rad));
+    if(cosH>1||cosH<-1)return null;
+    let H=(rise?360-deg*Math.acos(cosH):deg*Math.acos(cosH))/15;
+    let UT=(H+RA-(0.06571*t)-6.622)-lngHour;return ((UT%24)+24)%24;
+  }
+  const srUT=calc(true),ssUT=calc(false);if(srUT==null||ssUT==null)return null;
+  const off=-date.getTimezoneOffset()/60;
+  return {sunrise:((srUT+off)%24+24)%24, sunset:((ssUT+off)%24+24)%24};
+}
+function currentSun(){if(!USER_COORDS)return null;try{const s=sunTimes(new Date(),USER_COORDS.lat,USER_COORDS.lon);return (s&&isFinite(s.sunrise)&&isFinite(s.sunset))?s:null;}catch(e){return null;}}
+function fmtHM(h){let hh=Math.floor(h),mm=Math.round((h-hh)*60);if(mm===60){hh++;mm=0;}return String((hh+24)%24).padStart(2,"0")+":"+String(mm).padStart(2,"0");}
+
+/* TIME OF DAY — uses local sun times when GPS shared, else clock bands */
+function labelTime(t){return{dawn:"Dawn",morning:"Morning",midday:"Midday",evening:"Evening",night:"Night"}[t]}
+function clockBand(h){if(h>=4&&h<7)return"dawn";if(h>=7&&h<10)return"morning";if(h>=10&&h<16)return"midday";if(h>=16&&h<21)return"evening";return"night";}
+function bandFromSun(h,sr,ss){
+  if(h<sr-0.75||h>=ss+0.75)return"night";
+  if(h<sr+1.25)return"dawn";
+  if(h>=ss-2.0)return"evening";
+  if(h<sr+4)return"morning";
+  return"midday";
+}
+function computeTimeOfDay(){const n=new Date(),h=n.getHours()+n.getMinutes()/60,sun=currentSun();return sun?bandFromSun(h,sun.sunrise,sun.sunset):clockBand(h);}
+function updateTimeOfDayDisplay(){
+  const el=document.getElementById("timeOfDayDisplay");if(!el)return;
+  let txt="Time of day: "+labelTime(computeTimeOfDay());
+  const sun=currentSun();
+  if(sun)txt+=` · sunrise ${fmtHM(sun.sunrise)} · sunset ${fmtHM(sun.sunset)}`;
+  el.textContent=txt;
+}
+
+/* TOGGLE GROUP CONFIG — [value, label, icon]; first entry is the default */
+const TOGGLES={
+  waterType:[["river","River","🏞️"],["lake","Lake","🛶"],["canal","Canal","🚧"]],
+  clarity:[["clear","Clear","💎"],["slightly_coloured","Slightly coloured","🌫️"],["dirty","Dirty","🟤"]],
+  flow:[["normal","Normal","💧"],["low","Low","🪨"],["high","High","🌊"]],
+  rising:[["unsure","Unsure","❓"],["yes","Yes","🐟"],["no","No","🚫"]],
+  waterTemp:[["cold","Cold","❄️"],["mild","Mild","🌤️"],["warm","Warm","🔥"]],
+  sky:[["sunny","Sunny","☀️"],["cloudy","Cloudy","⛅"],["overcast","Overcast","☁️"]],
+  wind:[["calm","Calm","🍃"],["breezy","Breezy","🌬️"],["windy","Windy","💨"]],
+  riverTrend:[["stable","Stable","➡️"],["rising","Rising","📈"],["dropping","Dropping","📉"]],
+  hatch:[["none","None","✖️"],["mayfly","Mayfly","🦟"],["caddis","Caddis","🐛"],["midge","Midge","🦠"],["damsel","Damsel","🦋"]],
+  structure:[["riffle","Riffle","🌊"],["run","Run","🏞️"],["pool","Pool","🕳️"],["bank","Undercut bank","🧱"],["edge","Lake edge","🪵"]],
+  behaviour:[["unsure","Unsure","❓"],["chasing","Chasing bait","🐟"],["deep","Sitting deep","⬇️"],["cruising","Cruising edges","↔️"]]
 };
 
-/* FLY DATABASE */
+function buildToggles(){
+  Object.keys(TOGGLES).forEach(id=>{
+    const host=document.getElementById(id);
+    if(!host)return;
+    host.classList.add("toggle");
+    host.dataset.toggle="1";
+    const opts=TOGGLES[id];
+    host.dataset.value=opts[0][0];
+    host.innerHTML="";
+    opts.forEach(([v,t,icon],idx)=>{
+      const b=document.createElement("button");
+      b.type="button";
+      b.className="tbtn"+(idx===0?" sel":"");
+      b.dataset.v=v;
+      b.innerHTML=`<span class="ti">${icon}</span><span>${t}</span>`;
+      b.addEventListener("click",()=>{
+        host.dataset.value=v;
+        host.querySelectorAll(".tbtn").forEach(x=>x.classList.remove("sel"));
+        b.classList.add("sel");
+      });
+      host.appendChild(b);
+    });
+  });
+}
+
+/* SAFE GETTER — reads a <select> or a toggle group */
+const safe = id => {
+  const el = document.getElementById(id);
+  if(!el) return "";
+  if(el.dataset && el.dataset.toggle) return el.dataset.value || "";
+  return el.value || "";
+};
+
+/* HOW TO FISH EACH FLY TYPE */
+const TYPE_GUIDE={
+  nymph:"Fished below the surface, where trout do the great majority of their feeding. Cast up and slightly across, then dead-drift it back at exactly the current's speed with no drag — most of the work is keeping a natural drift. Use a strike indicator or a dry-dropper and set the hook on any pause, twitch, or hesitation. Add weight, a heavier fly, or a longer leader to get down to the fish in deeper or faster water.",
+  dry:"Fished on the surface to imitate an adult insect. Cast upstream of a rising or holding fish and aim for a drag-free drift — mend your line to stop the current dragging the fly unnaturally. Treat it with floatant, watch the fly closely, and pause for a beat after the take before lifting so you don't pull it out of the fish's mouth.",
+  streamer:"Imitates baitfish, bullies and leeches, and is fished to provoke a chase rather than match a hatch. Cast across or down-and-across and either strip it back in short pulls or let it swing through the run below you. Vary the speed and add pauses until you find what triggers a take — grabs are often violent, so keep a tight line and use a sink-tip or weighted fly to reach deeper fish."
+};
+
+/* FLY DATABASE — expanded, technique-focused tips */
 const FLIES=[
-{name:"Hare & Copper",type:"nymph",subType:"mayfly",sizes:[10,12,14],tips:["Heavy point fly.","Dead-drift.","All-rounder."]},
-{name:"Pheasant Tail",type:"nymph",subType:"mayfly",sizes:[12,14,16],tips:["Clear water.","Long leader.","Dead-drift."]},
-{name:"Gold-Ribbed Hare’s Ear",type:"nymph",subType:"mayfly",sizes:[10,12,14],tips:["Search pattern.","Works everywhere.","Fish seams."]},
-{name:"Stonefly Bomb",type:"nymph",subType:"stonefly",sizes:[8,10],tips:["Fast water.","Anchor fly.","Deep runs."]},
-{name:"Glo-bug Egg",type:"nymph",subType:"egg",sizes:[8,10],tips:["Spawning.","Behind trout.","Canals."]},
-{name:"Damsel Nymph",type:"nymph",subType:"damsel",sizes:[10,12],tips:["Weed beds.","Slow retrieve.","Lakes."]},
-{name:"Adams",type:"dry",subType:"mayfly",sizes:[12,14,16],tips:["Hatches.","Drag-free.","Clear rivers."]},
-{name:"Parachute Adams",type:"dry",subType:"mayfly",sizes:[14,16],tips:["Emerger.","Picky fish.","Fine tippet."]},
-{name:"Royal Wulff",type:"dry",subType:"attractor",sizes:[10,12],tips:["High float.","Riffles.","Dry-dropper."]},
-{name:"Humpy",type:"dry",subType:"terrestrial",sizes:[10,12],tips:["Beetle.","Windy days.","Banks."]},
-{name:"Green Beetle",type:"dry",subType:"terrestrial",sizes:[12,14],tips:["Windy summer.","Lake edges.","Let sit."]},
-{name:"Foam Cicada",type:"dry",subType:"terrestrial",sizes:[6,8],tips:["Summer.","Plop it.","Bush edges."]},
-{name:"Elk Hair Caddis",type:"dry",subType:"caddis",sizes:[12,14],tips:["Riffles.","Skitter.","Evening."]},
-{name:"Olive Woolly Bugger",type:"streamer",subType:"baitfish",sizes:[6,8],tips:["Strip.","After rain.","Sink tip."]},
-{name:"Black Woolly Bugger",type:"streamer",subType:"baitfish",sizes:[6,8],tips:["Low light.","Long pulls.","Coloured water."]},
-{name:"Booby Fly",type:"streamer",subType:"lure",sizes:[6,8],tips:["Sinking line.","Slow retrieve.","Lakes/canals."]},
-{name:"Copper John",type:"nymph",subType:"mayfly",sizes:[12,14],tips:["Fast sink.","Deep runs.","Point fly."]},
-{name:"Zebra Midge",type:"nymph",subType:"midge",sizes:[16,18],tips:["Winter.","Slow water.","Indicator."]},
-{name:"Red Setter",type:"streamer",subType:"lure",sizes:[4,6],tips:["Taupō.","Strip fast.","Dirty water."]},
-{name:"Rabbit Zonker",type:"streamer",subType:"baitfish",sizes:[4,6],tips:["Night.","Big trout.","Slow strips."]},
-{name:"Pine Squirrel Leech",type:"streamer",subType:"leech",sizes:[8,10],tips:["Cold water.","Slow retrieve.","Lakes."]},
-{name:"CDC Emerger",type:"dry",subType:"emerger",sizes:[14,16],tips:["Evening.","Delicate.","Fine tippet."]},
-{name:"Blowfly Dry",type:"dry",subType:"terrestrial",sizes:[10,12],tips:["Summer.","Windy.","Natural drift."]},
-{name:"Klinkhammer",type:"dry",subType:"emerger",sizes:[12,14],tips:["Emerger.","Picky fish.","Long leader."]}
+{name:"Hare & Copper",type:"nymph",subType:"mayfly",sizes:[10,12,14],tips:["Heavily weighted, so fish it as the deeper 'anchor' fly in a two-nymph rig.","Dead-drift it through riffles and the heads of runs — it passes for a wide range of mayfly nymphs.","The classic NZ searching nymph: tie this on first when you don't know what the fish are eating."]},
+{name:"Pheasant Tail",type:"nymph",subType:"mayfly",sizes:[12,14,16],tips:["Slim, sparse profile for clear, smooth water and educated trout.","Fish it on a long, fine leader and drift it naturally past sighted fish.","If fish refuse, drop a size or switch to a flashback version to add a little trigger."]},
+{name:"Gold-Ribbed Hare’s Ear",type:"nymph",subType:"mayfly",sizes:[10,12,14],tips:["Buggy, generic shape that passes for both mayfly and caddis nymphs.","Work it through current seams and the broken water at the head of a pool.","A true all-water confidence fly — fish it under an indicator and cover water."]},
+{name:"Stonefly Bomb",type:"nymph",subType:"stonefly",sizes:[8,10],tips:["Big and heavy — use it to punch down through fast, broken pocket water.","Run it as the anchor with a smaller nymph trailing 40–50cm behind.","Bounce it right along the bottom of deep runs where the better trout hold."]},
+{name:"Glo-bug Egg",type:"nymph",subType:"egg",sizes:[8,10],tips:["Drift it dead behind spawning trout or just below a redd.","A go-to in coloured water and the hydro canals — the bright blob is easy for fish to find.","Fish it under an indicator and strike at the slightest stall or check."]},
+{name:"Damsel Nymph",type:"nymph",subType:"damsel",sizes:[10,12],tips:["Retrieve with slow, steady draws along weed beds and lake margins.","Let it sink first, then crawl it back to mimic a swimming damsel nymph.","Deadly on stillwaters through late spring and summer."]},
+{name:"Adams",type:"dry",subType:"mayfly",sizes:[12,14,16],tips:["A grey all-rounder that imitates most mayfly duns on the water.","Cast upstream of the rise and get a clean, drag-free float over the fish.","Carry several sizes and match the size of the natural you see hatching."]},
+{name:"Parachute Adams",type:"dry",subType:"mayfly",sizes:[14,16],tips:["The parachute hackle sits the body low in the film, like a vulnerable emerger.","The white post makes it easy to track on broken or glary water.","Fish fine tippet and a soft, accurate presentation to picky risers."]},
+{name:"Royal Wulff",type:"dry",subType:"attractor",sizes:[10,12],tips:["A high-floating attractor — not an imitation, but trout grab it on impulse.","Ideal for bouncy riffles and pocket water where visibility is hard.","Hang a nymph 30–60cm below it as a dry-dropper to cover surface and subsurface at once."]},
+{name:"Humpy",type:"dry",subType:"terrestrial",sizes:[10,12],tips:["Buoyant deer-hair body rides rough water and wind all day without sinking.","Fish it tight to the bank as a beetle or general terrestrial.","A reliable searching dry when nothing is actively hatching."]},
+{name:"Green Beetle",type:"dry",subType:"terrestrial",sizes:[12,14],tips:["Cast it hard against grassy banks on warm, breezy summer days.","Let it sit dead-still — a tiny twitch is enough to draw a fish's eye.","A NZ summer staple, especially along lake edges."]},
+{name:"Foam Cicada",type:"dry",subType:"terrestrial",sizes:[6,8],tips:["Plop it down with a deliberate splat — the splash itself calls fish up.","Fish bush-lined banks through cicada season (mid-to-late summer).","Hold on: takes on a cicada are often explosive."]},
+{name:"Elk Hair Caddis",type:"dry",subType:"caddis",sizes:[12,14],tips:["Skitter and twitch it across riffles to mimic an egg-laying adult caddis.","Deadly during the evening caddis rise.","Floats high in fast water — also makes a great dry-dropper indicator."]},
+{name:"Olive Woolly Bugger",type:"streamer",subType:"baitfish",sizes:[6,8],tips:["Strip it back in short pulls to imitate a fleeing bully or small baitfish.","Excellent in slightly coloured water in the days after rain.","Fish it on a sink-tip and keep varying the retrieve until a fish commits."]},
+{name:"Black Woolly Bugger",type:"streamer",subType:"baitfish",sizes:[6,8],tips:["The dark silhouette shows up best in low light and dirty water.","Use long, slow pulls through pools and under cut banks.","A top night-fishing fly for big browns."]},
+{name:"Booby Fly",type:"streamer",subType:"lure",sizes:[6,8],tips:["Fish on a fast-sinking line with a short leader, right on the bottom.","Use a slow, twitchy retrieve — the foam eyes make it hover and wobble enticingly.","A canal and lake specialist for deep, lazy fish."]},
+{name:"Copper John",type:"nymph",subType:"mayfly",sizes:[12,14],tips:["The copper-wire body sinks fast — it gets down quickly in deep, fast runs.","Use it as the anchor fly in a nymph rig.","The flash gives fish a target in slightly coloured water."]},
+{name:"Zebra Midge",type:"nymph",subType:"midge",sizes:[16,18],tips:["Tiny and simple — fish it slow and deep through winter and cold snaps.","Suspend it under an indicator in slow pools and tailouts.","Drop it behind a larger nymph as the small, subtle second fly."]},
+{name:"Red Setter",type:"streamer",subType:"lure",sizes:[4,6],tips:["A Taupō classic — strip it fast through coloured or rising water.","The hot colour stands out when visibility is poor.","Swing it through a run and hang on at the end of the swing."]},
+{name:"Rabbit Zonker",type:"streamer",subType:"baitfish",sizes:[4,6],tips:["The rabbit-fur wing breathes and pulses with life on a slow strip.","Fish it after dark for the biggest browns in the system.","Let it sink, then creep it back close along the bottom."]},
+{name:"Pine Squirrel Leech",type:"streamer",subType:"leech",sizes:[8,10],tips:["Crawl it slowly to imitate a swimming leech.","Best in cold water when fish won't chase a fast fly.","A reliable lake pattern fished on an intermediate line."]},
+{name:"CDC Emerger",type:"dry",subType:"emerger",sizes:[14,16],tips:["Sits right in the surface film like a hatching mayfly — the stage selective fish key on.","Fish it on fine tippet during the evening rise.","Grease the body but leave the CDC wing dry so it hangs naturally."]},
+{name:"Blowfly Dry",type:"dry",subType:"terrestrial",sizes:[10,12],tips:["Imitates the blowflies that pester fish on hot summer days.","Fish it on a natural, drag-free drift tight to the bank.","Comes into its own when wind is putting terrestrials on the water."]},
+{name:"Klinkhammer",type:"dry",subType:"emerger",sizes:[12,14],tips:["The angled body hangs the abdomen below the film like an emerging insect.","The high para-post is very visible — also a great dry-dropper indicator.","Fish a long leader to wary, surface-feeding trout."]}
 ];
 
-/* SCORING — EVERY PARAMETER MATTERS */
-function scoreFly(f,c){
-let s=0;
+function detailsHtml(f){
+  const tips=f.tips.map(t=>`<li>${t}</li>`).join("");
+  return `<details><summary>Tips &amp; Tricks</summary>
+<div class="howto"><b>How to fish a ${f.type}:</b> ${TYPE_GUIDE[f.type]||""}</div>
+<ul>${tips}</ul></details>`;
+}
 
-/* REGION */
-if(c.region==="otago"&&["Hare & Copper","Pheasant Tail","Parachute Adams"].includes(f.name))s+=2;
-if(c.region==="southland"&&["Humpy","Royal Wulff","Olive Woolly Bugger","Black Woolly Bugger"].includes(f.name))s+=2;
-if(c.region==="taupo"&&["Glo-bug Egg","Red Setter","Zebra Midge"].includes(f.name))s+=3;
+/* ============================================================
+   SCORING ENGINE (research-validated, two-tier) + reasons
+   evalFly returns { score, reasons } so each pick can explain itself.
+   Tier 1 = primary drivers (heavy, can be negative).
+   Tier 2 = modifiers. Every parameter & option shifts the score.
+   ============================================================ */
+function evalFly(f,c){
+let s=0; const reasons=[];
+const add=(pts,text)=>{ s+=pts; if(pts>0&&text) reasons.push({pts,text}); };
+const isNymph=f.type==="nymph", isDry=f.type==="dry", isStreamer=f.type==="streamer";
+const sub=f.subType;
+const SEARCH_NYMPH=["Hare & Copper","Pheasant Tail","Gold-Ribbed Hare’s Ear","Copper John"].includes(f.name);
+const HEAVY_NYMPH=["Stonefly Bomb","Copper John","Glo-bug Egg"].includes(f.name);
+const DARK_STREAMER=["Black Woolly Bugger","Rabbit Zonker","Pine Squirrel Leech"].includes(f.name);
 
-/* WATER TYPE */
-if(c.waterType==="river"&&f.type==="nymph")s+=2;
-if(c.waterType==="lake"&&f.type==="dry")s+=2;
-if(c.waterType==="canal"&&["Glo-bug Egg","Zebra Midge","Booby Fly"].includes(f.name))s+=4;
+/* ---------- TIER 1 ---------- */
 
 /* CLARITY */
-if(c.clarity==="clear"&&f.type==="dry")s+=2;
-if(c.clarity==="dirty"&&f.type==="streamer")s+=4;
+if(c.clarity==="clear"){ if(isDry)add(3,"Clear water → dry fly"); if(sub==="mayfly"||sub==="emerger")add(2,"Clear water rewards natural imitations"); if(isStreamer)add(-2); }
+if(c.clarity==="slightly_coloured"){ if(isNymph)add(3,"Tinted water → nymph"); if(isStreamer)add(2,"A tint lets a streamer work"); if(isDry)add(-1); }
+if(c.clarity==="dirty"){ if(isStreamer)add(5,"Dirty water → big visible streamer"); if(sub==="egg")add(4,"Dirty water → bright egg pattern"); if(HEAVY_NYMPH)add(3,"Heavy nymph gets down in dirty water"); if(DARK_STREAMER)add(2,"Dark silhouette shows in murky water"); if(isDry)add(-4); }
+
+/* WATER TEMPERATURE */
+if(c.waterTemp==="cold"){ if(isNymph)add(3,"Cold water → deep nymph"); if(isStreamer)add(2,"Cold fish take a slow streamer"); if(sub==="midge")add(2,"Cold/winter → tiny midge"); if(isDry)add(-2); }
+if(c.waterTemp==="mild"){ if(isDry)add(3,"Mild temp → surface feeding"); if(isNymph)add(2,"Mild temp → active nymphing"); if(sub==="emerger")add(2,"Mild temp → emergers"); }
+if(c.waterTemp==="warm"){ if(sub==="terrestrial")add(4,"Warm summer → terrestrials"); if(isDry)add(2,"Warm water → surface feeding"); if(sub==="caddis")add(1,"Warm evenings → caddis"); if(isNymph)add(-1); }
 
 /* FLOW */
-if(c.flow==="low"&&f.type==="dry")s+=2;
-if(c.flow==="high"&&f.type==="nymph")s+=3;
-
-/* RISING */
-if(c.rising==="yes"&&f.type==="dry")s+=4;
-if(c.rising==="no"&&f.type==="nymph")s+=3;
-
-/* WATER TEMP */
-if(c.waterTemp==="cold"&&f.type==="nymph")s+=3;
-if(c.waterTemp==="warm"&&f.subType==="terrestrial")s+=3;
-
-/* SKY */
-if(c.sky==="sunny"&&f.subType==="terrestrial")s+=3;
-if(c.sky==="overcast"&&f.type==="streamer")s+=3;
-
-/* WIND */
-if(c.wind==="windy"&&f.subType==="terrestrial")s+=4;
+if(c.flow==="low"){ if(isDry)add(3,"Low flow → dry fly"); if(isStreamer)add(-2); }
+if(c.flow==="normal"){ if(isNymph)add(2,"Normal flow suits nymphing"); if(isDry)add(2,"Normal flow suits dries"); }
+if(c.flow==="high"){ if(isNymph)add(4,"High flow → heavy nymph"); if(isStreamer)add(4,"High flow → streamer"); if(sub==="egg")add(2,"High water → egg pattern"); if(isDry)add(-3); }
 
 /* RIVER TREND */
-if(c.riverTrend==="rising"&&f.type==="streamer")s+=3;
-if(c.riverTrend==="dropping"&&f.type==="nymph")s+=3;
+if(c.riverTrend==="rising"){ if(isStreamer)add(4,"Rising river → streamer"); if(sub==="egg")add(3,"Rising water washes in food (egg)"); if(HEAVY_NYMPH)add(2,"Rising water → heavy nymph"); if(isDry)add(-2); }
+if(c.riverTrend==="stable"){ if(isDry)add(2,"Settled river → confident dries"); if(isNymph)add(1,"Settled river → nymphing"); }
+if(c.riverTrend==="dropping"){ if(isNymph)add(3,"Dropping/clearing → nymph"); if(isDry)add(2,"Clearing water → dries"); }
 
-/* HATCH */
-if(c.hatch!=="none"&&f.subType===c.hatch)s+=5;
+/* FISH RISING? */
+if(c.rising==="yes"){ if(isDry)add(5,"Fish rising → dry fly"); if(sub==="emerger")add(3,"Rising fish → emerger"); if(isNymph)add(-1); }
+if(c.rising==="no"){ if(isNymph)add(4,"No rises → nymph"); if(isStreamer)add(2,"No surface feeding → streamer"); if(isDry)add(-2); }
+if(c.rising==="unsure"){ if(isNymph)add(2,"Unsure → searching nymph"); if(isDry)add(1,"Hedge with a dry-dropper"); }
+
+/* FISH BEHAVIOUR */
+if(c.behaviour==="chasing"){ if(isStreamer)add(6,"Fish chasing bait → streamer"); }
+if(c.behaviour==="deep"){ if(isNymph)add(5,"Fish sitting deep → nymph"); if(isStreamer)add(2,"Reach deep fish with a streamer"); }
+if(c.behaviour==="cruising"){ if(isDry)add(3,"Cruising fish → dry fly"); if(f.name==="Damsel Nymph")add(3,"Cruisers eat damsels"); if(sub==="terrestrial")add(1,"Edge cruisers take terrestrials"); }
+if(c.behaviour==="unsure"){ if(isNymph)add(2,"Unknown behaviour → searching nymph"); if(sub==="attractor")add(1,"Search with an attractor"); }
+
+/* HATCH — match is override-strength */
+if(c.hatch==="none"){ if(sub==="attractor")add(2,"No hatch → attractor"); if(SEARCH_NYMPH)add(1,"No hatch → searching nymph"); if(sub==="terrestrial")add(1,"No hatch → terrestrial"); }
+else { if(sub===c.hatch)add(6,c.hatch+" hatch — exact match"); if((c.hatch==="mayfly"||c.hatch==="caddis")&&sub==="emerger")add(3,"Emerger for the "+c.hatch+" hatch"); }
+
+/* TIME / LIGHT */
+if(c.time==="dawn"){ if(isStreamer)add(4,"Dawn low light → streamer"); }
+if(c.time==="morning"){ if(isDry)add(2,"Morning → dry fly"); if(isNymph)add(1,"Morning nymphing"); }
+if(c.time==="midday"){ if(isNymph)add(4,"Bright midday → deep nymph"); if(sub==="terrestrial")add(2,"Midday sun → terrestrial"); if(isDry)add(-1); }
+if(c.time==="evening"){ if(isDry)add(4,"Evening rise → dry fly"); if(sub==="caddis")add(3,"Evening → caddis"); if(sub==="emerger")add(3,"Evening → emerger"); }
+if(c.time==="night"){ if(isStreamer)add(6,"Night → streamer"); if(DARK_STREAMER)add(3,"Night → dark streamer"); }
+
+/* ---------- TIER 2 ---------- */
+
+/* SKY / LIGHT */
+if(c.sky==="sunny"){ if(sub==="terrestrial")add(3,"Sun → terrestrials active"); if(isNymph)add(1,"Bright sun → fish deeper on a nymph"); if(isDry&&sub!=="terrestrial")add(-1); }
+if(c.sky==="cloudy"){ if(sub==="mayfly")add(2,"Cloud → mayfly hatch weather"); if(sub==="emerger")add(2,"Cloud → emergers"); if(isDry)add(1,"Cloud → good dry-fly light"); }
+if(c.sky==="overcast"){ if(isStreamer)add(3,"Overcast low light → streamer"); if(sub==="baitfish")add(2,"Low light → baitfish streamer"); }
+
+/* WIND */
+if(c.wind==="calm"){ if(isDry)add(2,"Calm → delicate dry presentation"); if(sub==="emerger")add(2,"Calm → emerger"); }
+if(c.wind==="breezy"){ if(sub==="terrestrial")add(2,"Breeze blows in terrestrials"); if(sub==="caddis")add(1,"Breeze → caddis"); }
+if(c.wind==="windy"){ if(sub==="terrestrial")add(4,"Wind puts terrestrials on the water"); if(isStreamer)add(1,"Lake chop → streamer"); }
+
+/* WATER TYPE */
+if(c.waterType==="river"){ if(isNymph)add(2,"River → nymph"); if(isDry)add(1,"River → dry fly"); }
+if(c.waterType==="lake"){ if(f.name==="Damsel Nymph")add(3,"Lake → damsel nymph"); if(["Booby Fly","Pine Squirrel Leech"].includes(f.name))add(2,"Lake → booby/leech"); if(sub==="terrestrial")add(2,"Lake edges → terrestrial"); if(isStreamer)add(1,"Lake → streamer"); if(isNymph&&f.name!=="Damsel Nymph")add(-1); }
+if(c.waterType==="canal"){ if(sub==="egg")add(4,"Canal → egg"); if(sub==="midge")add(3,"Canal → midge"); if(f.name==="Booby Fly")add(3,"Canal → booby"); if(sub==="baitfish"||sub==="lure")add(2,"Canal → baitfish/lure"); if(isDry)add(-2); }
 
 /* STRUCTURE */
-if(c.structure==="riffle"&&f.subType==="caddis")s+=3;
-if(c.structure==="bank"&&f.subType==="terrestrial")s+=4;
+if(c.structure==="riffle"){ if(sub==="caddis")add(3,"Riffle → caddis"); if(sub==="attractor")add(2,"Riffle → attractor"); if(isNymph)add(2,"Riffle → nymph"); }
+if(c.structure==="run"){ if(isNymph)add(3,"Run → nymph"); if(isStreamer)add(1,"Run → swung streamer"); }
+if(c.structure==="pool"){ if(isStreamer)add(3,"Pool depth → streamer"); if(isNymph)add(2,"Pool → nymph"); if(sub==="leech")add(1,"Pool → leech"); }
+if(c.structure==="bank"){ if(sub==="terrestrial")add(4,"Undercut bank → terrestrial"); if(isStreamer)add(2,"Bank ambush → streamer"); }
+if(c.structure==="edge"){ if(f.name==="Damsel Nymph")add(3,"Lake edge → damsel"); if(sub==="terrestrial")add(3,"Lake edge → terrestrial"); if(["Booby Fly","Pine Squirrel Leech"].includes(f.name))add(2,"Lake edge → booby/leech"); }
 
-/* BEHAVIOUR */
-if(c.behaviour==="chasing"&&f.type==="streamer")s+=5;
-if(c.behaviour==="deep"&&f.type==="nymph")s+=4;
+/* REGION (NZ) */
+if(c.region==="otago"&&["Pheasant Tail","Hare & Copper","Parachute Adams","Green Beetle","Foam Cicada"].includes(f.name))add(2,"Otago favourite");
+if(c.region==="southland"&&["Humpy","Royal Wulff","Olive Woolly Bugger","Black Woolly Bugger"].includes(f.name))add(2,"Southland favourite");
+if(c.region==="canterbury"&&["Hare & Copper","Pheasant Tail","Stonefly Bomb","Royal Wulff"].includes(f.name))add(2,"Canterbury braided-river pick");
+if(c.region==="westcoast"&&["Olive Woolly Bugger","Black Woolly Bugger","Foam Cicada","Humpy"].includes(f.name))add(2,"West Coast coloured-water pick");
+if(c.region==="taupo"&&["Glo-bug Egg","Red Setter","Zebra Midge","Rabbit Zonker"].includes(f.name))add(3,"Taupō classic");
+if(c.region==="rotorua"&&["Booby Fly","Rabbit Zonker","Damsel Nymph","Olive Woolly Bugger"].includes(f.name))add(2,"Rotorua lake pick");
 
-/* TIME */
-if(c.time==="dawn"&&f.type==="streamer")s+=4;
-if(c.time==="morning"&&f.type==="dry")s+=3;
-if(c.time==="midday"&&f.type==="nymph")s+=4;
-if(c.time==="night"&&f.type==="streamer")s+=6;
-
-return s;
+return {score:s, reasons};
 }
 
 function recommend(c){
-return FLIES.map(f=>({fly:f,score:scoreFly(f,c)}))
+return FLIES.map(f=>{const r=evalFly(f,c);return {fly:f,score:r.score,reasons:r.reasons};})
 .sort((a,b)=>b.score-a.score)
 .slice(0,6);
 }
@@ -242,13 +388,12 @@ const resultsCard=document.getElementById("resultsCard");
 function renderLibrary(){
 library.innerHTML="";
 FLIES.forEach(f=>{
-let tips=f.tips.map(t=>`<li>${t}</li>`).join("");
 let d=document.createElement("div");
 d.className="fly-card";
 d.innerHTML=`<div class="fly-name">${f.name}</div>
 <div class="fly-type">${f.type} • ${f.subType}</div>
 <div class="small">Sizes: ${f.sizes.join(", ")}</div>
-<details><summary>Tips & Tricks</summary><ul>${tips}</ul></details>`;
+${detailsHtml(f)}`;
 library.appendChild(d);
 });
 }
@@ -266,55 +411,119 @@ conditionsCard.style.display="block";
 resultsCard.style.display="block";
 };
 
-/* ⭐ THE TRUE INFINITE‑CLICK BUTTON ⭐ */
-document.addEventListener("DOMContentLoaded",()=>{
+/* GPS — runs automatically on load: nearest region + local sun times. Coordinates stay on-device. */
+function locateMe(){
+  const geoStatus=document.getElementById("geoStatus");
+  if(!navigator.geolocation){ if(geoStatus)geoStatus.textContent="Location isn't available — using the dropdown."; return; }
+  if(geoStatus)geoStatus.textContent="📍 Finding your location…";
+  navigator.geolocation.getCurrentPosition(pos=>{
+    USER_COORDS={lat:pos.coords.latitude,lon:pos.coords.longitude};
+    const nr=nearestRegion(USER_COORDS.lat,USER_COORDS.lon);
+    const sel=document.getElementById("region");
+    if(sel&&nr.region) sel.value=nr.region;
+    const name=REGION_NAME[nr.region]||nr.region;
+    if(geoStatus)geoStatus.textContent=`📍 Nearest region: ${name} (~${Math.round(nr.km)} km away). Time of day uses your local sunrise/sunset.`;
+    updateTimeOfDayDisplay();
+  },err=>{
+    let m="Couldn't get your location — using the dropdown.";
+    if(err.code===1)m="Location off — using the dropdown. Allow location to auto-set your region.";
+    else if(err.code===2)m="Location unavailable — using the dropdown.";
+    else if(err.code===3)m="Location timed out — using the dropdown.";
+    if(geoStatus)geoStatus.textContent=m;
+  },{enableHighAccuracy:true,timeout:10000,maximumAge:600000});
+}
 
-updateTimeOfDayDisplay();
+/* RECOMMEND — ranked, medals, why, crash-proof */
+let runCount=0;
+const MEDAL=["gold","silver","bronze"];
 
-document.getElementById("recommendBtn").addEventListener("click",()=>{
+function runRecommend(){
+  runCount++;
+  const out=document.getElementById("results");
+  const status=document.getElementById("resultsStatus");
+  try{
+    const c={
+      region:safe("region"),
+      waterType:safe("waterType"),
+      clarity:safe("clarity"),
+      flow:safe("flow"),
+      rising:safe("rising"),
+      waterTemp:safe("waterTemp"),
+      sky:safe("sky"),
+      wind:safe("wind"),
+      riverTrend:safe("riverTrend"),
+      hatch:safe("hatch"),
+      structure:safe("structure"),
+      behaviour:safe("behaviour"),
+      time:computeTimeOfDay()
+    };
 
-const c={
-region:safe("region"),
-waterType:safe("waterType"),
-clarity:safe("clarity"),
-flow:safe("flow"),
-rising:safe("rising"),
-waterTemp:safe("waterTemp"),
-sky:safe("sky"),
-wind:safe("wind"),
-riverTrend:safe("riverTrend"),
-hatch:safe("hatch"),
-structure:safe("structure"),
-behaviour:safe("behaviour"),
-time:computeTimeOfDayFromClock()
-};
+    updateTimeOfDayDisplay();
 
-updateTimeOfDayDisplay();
+    const recs=recommend(c);
+    out.innerHTML="";
 
-const recs=recommend(c);
-const out=document.getElementById("results");
-out.innerHTML="";
-
-recs.forEach(r=>{
-let tips=r.fly.tips.map(t=>`<li>${t}</li>`).join("");
-let d=document.createElement("div");
-d.className="fly-card";
-d.innerHTML=`
-<div style="display:flex;justify-content:space-between;">
+    recs.forEach((r,i)=>{
+      const badge = i<3
+        ? `<span class="medal ${MEDAL[i]}" title="Rank ${i+1}"><span class="ribbon"></span><span class="disc">${i+1}</span></span>`
+        : `<span class="tag">#${i+1}</span>`;
+      const why = r.reasons.slice().sort((a,b)=>b.pts-a.pts).slice(0,3).map(x=>x.text);
+      const whyHtml = why.length
+        ? `<div class="why"><b>Why:</b> ${why.join(" · ")}</div>`
+        : `<div class="why"><b>Why:</b> a solid all-round choice for these conditions</div>`;
+      let d=document.createElement("div");
+      d.className="fly-card";
+      d.innerHTML=`
+<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:.5rem;">
   <div>
     <div class="fly-name">${r.fly.name}</div>
     <div class="fly-type">${r.fly.type} • ${r.fly.subType}</div>
   </div>
-  <span class="tag">${r.score}</span>
+  ${badge}
 </div>
 <div class="small">Sizes: ${r.fly.sizes.join(", ")}</div>
-<details><summary>Tips & Tricks</summary><ul>${tips}</ul></details>
-`;
-out.appendChild(d);
-});
+${whyHtml}
+${detailsHtml(r.fly)}`;
+      out.appendChild(d);
+    });
 
-});
-});
+    const now=new Date();
+    const hh=String(now.getHours()).padStart(2,"0");
+    const mm=String(now.getMinutes()).padStart(2,"0");
+    const ss=String(now.getSeconds()).padStart(2,"0");
+    const top=recs[0]?recs[0].fly.name:"none";
+    let line=`Run #${runCount} · ${hh}:${mm}:${ss} · top pick: ${top}`;
+    if(c.waterTemp==="warm") line+=" — warm water: fish dawn/dusk & handle fish gently";
+    if(status)status.textContent=line;
+  }catch(err){
+    if(out){
+      const e=document.createElement("div");
+      e.className="errbox";
+      e.textContent="Recommend failed on run #"+runCount+":\n"+(err&&err.stack?err.stack:String(err));
+      out.prepend(e);
+    }
+    if(status)status.textContent="Run #"+runCount+" hit an error — see red box above.";
+  }
+}
+
+(function init(){
+  buildToggles();
+  updateTimeOfDayDisplay();
+  locateMe();
+  const btn=document.getElementById("recommendBtn");
+  if(btn && !btn.dataset.bound){
+    btn.dataset.bound="1";
+    btn.addEventListener("click",runRecommend);
+  }
+})();
+
+/* PWA — register the service worker for offline use (only works over https/localhost;
+   silently no-ops on file:// or unsupported browsers, so nothing breaks). */
+if("serviceWorker" in navigator){
+  window.addEventListener("load",()=>{
+    navigator.serviceWorker.register("sw.js").catch(()=>{});
+  });
+}
 </script>
 
 </body>
