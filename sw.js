@@ -1,5 +1,5 @@
 /* NZ Fly Finder — service worker (offline app shell) */
-const CACHE = "nzflyfinder-v6";
+const CACHE = "nzflyfinder-v11";
 const ASSETS = [
   "./",
   "./index.html",
@@ -33,12 +33,12 @@ self.addEventListener("fetch", e => {
   const isPage = req.mode === "navigate" || req.destination === "document";
 
   if (isPage) {
-    /* Network-first for the app page: always get the latest when online,
-       fall back to the cached copy only when offline. */
+    /* Network-first for the app page, bypassing the HTTP cache so a stale
+       index.html can never be served while online. Fall back to cache offline. */
     e.respondWith(
-      fetch(req).then(resp => {
+      fetch(req.url, { cache: "reload" }).then(resp => {
         const copy = resp.clone();
-        caches.open(CACHE).then(c => c.put(req, copy)).catch(() => {});
+        caches.open(CACHE).then(c => c.put("./index.html", copy)).catch(() => {});
         return resp;
       }).catch(() => caches.match(req).then(c => c || caches.match("./index.html")))
     );
